@@ -1,1 +1,1 @@
-# stretch-admin
+# Stretch Me Administration
