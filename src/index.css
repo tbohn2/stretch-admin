@@ -1,0 +1,24 @@
+:root {
+    --pink: #db624c;
+    --white: #e7f3f7;
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+}
+
+.blueBG {
+    background-image: url('./assets/blueBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.cloudBG {
+    background-image: url('./assets/cloudBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    height: 90vh;
+    width: 90%;
+}
