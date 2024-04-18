@@ -1,4 +1,6 @@
+import { Calendar } from 'node-calendar';
 import React, { useState, useEffect } from 'react';
+import CalendarModal from '../Components/CalendarModal';
 
 function CalendarDisplay() {
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
@@ -6,10 +8,12 @@ function CalendarDisplay() {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
+    const [displayDate, setDisplayDate] = useState(currentDate);
     const [displayMonth, setDisplayMonth] = useState(currentMonth);
     const [displayYear, setDisplayYear] = useState(currentYear);
     const [displayDates, setdisplayDates] = useState(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
     const [appointments, setAppointments] = useState([]);
+    const [dayAppts, setDayAppts] = useState([]);
 
     async function getAppointments() {
         try {
@@ -57,9 +61,9 @@ function CalendarDisplay() {
         <div className='text-light d-flex flex-column align-items-center'>
             <div className=''>
                 <div id="calendar-header" className="d-flex justify-content-between align-items-center my-3">
-                    <button id="prev" className="monthNavBtn" onClick={handlePrevClick}>Prev</button>
+                    <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>Prev</button>
                     <h1 id="month-year" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
-                    <button id="next" className="monthNavBtn" onClick={handleNextClick}>Next</button>
+                    <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
                 </div>
                 <div id="calendar-body">
                     <div id="calendar-weekdays" className="d-flex justify-content-between">
@@ -76,7 +80,7 @@ function CalendarDisplay() {
                             return (
                                 <div className="d-flex">
                                     {week.map((date, index) => {
-                                        const dayAppts = appointments.filter(appt => appt.Date === date);
+                                        const apptsForDay = appointments.filter(appt => appt.Date === date);
 
                                         let numberDisplay
                                         let today = false
@@ -87,14 +91,15 @@ function CalendarDisplay() {
                                         if (date === currentDate && displayMonth === currentMonth && displayYear === currentYear) {
                                             today = true
                                         }
-                                        if (dayAppts.length != 0) {
+                                        if (apptsForDay.length != 0) {
                                             available = true
                                         }
                                         if (date < currentDate && displayMonth === currentMonth && displayYear === currentYear || displayMonth < currentMonth && displayYear === currentYear || displayYear < currentYear) {
                                             pastDate = true
                                         }
                                         return (
-                                            <div className={`px-1 date ${pastDate && 'pastDate'} ${today && 'currentDay'} ${!available && 'noAppts'}`}>{numberDisplay}</div>
+                                            <div className={`px-1 date ${pastDate && 'pastDate'} ${today && 'currentDay'} ${!available && 'noAppts'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
+                                                onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>{numberDisplay}</div>
                                         )
                                     })}
                                 </div>
@@ -103,6 +108,7 @@ function CalendarDisplay() {
                     </div>
                 </div>
             </div>
+            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} />
         </div>
     );
 }
