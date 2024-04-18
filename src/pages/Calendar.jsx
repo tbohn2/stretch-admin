@@ -3,17 +3,30 @@ import React, { useState, useEffect } from 'react';
 function CalendarDisplay() {
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
     const currentDate = new Date().getDate();
-    const currentDay = new Date().getDay();
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
     const [displayMonth, setDisplayMonth] = useState(currentMonth);
     const [displayYear, setDisplayYear] = useState(currentYear);
     const [displayDates, setdisplayDates] = useState(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
+    const [appointments, setAppointments] = useState([]);
+
+    async function getAppointments() {
+        try {
+            const response = await fetch(`http://localhost:5062/api/apptsInMonth/${displayMonth}/${displayYear}`);
+            const data = await response.json();
+            console.log(data);
+            setAppointments(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     useEffect(() => {
+        getAppointments();
         setdisplayDates(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
     }, [displayMonth, displayYear]);
+
 
     const handlePrevClick = () => {
         if (displayMonth === 1) {
@@ -43,13 +56,13 @@ function CalendarDisplay() {
     return (
         <div className='text-light d-flex flex-column align-items-center'>
             <div className=''>
-                <div id="calendar-header" class="d-flex justify-content-between align-items-center my-3">
-                    <button id="prev" class="monthNavBtn" onClick={handlePrevClick}>Prev</button>
-                    <h1 id="month-year" class="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
-                    <button id="next" class="monthNavBtn" onClick={handleNextClick}>Next</button>
+                <div id="calendar-header" className="d-flex justify-content-between align-items-center my-3">
+                    <button id="prev" className="monthNavBtn" onClick={handlePrevClick}>Prev</button>
+                    <h1 id="month-year" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
+                    <button id="next" className="monthNavBtn" onClick={handleNextClick}>Next</button>
                 </div>
                 <div id="calendar-body">
-                    <div id="calendar-weekdays" class="d-flex justify-content-between">
+                    <div id="calendar-weekdays" className="d-flex justify-content-between">
                         <div>Sun</div>
                         <div>Mon</div>
                         <div>Tue</div>
@@ -61,13 +74,27 @@ function CalendarDisplay() {
                     <div id="calendar-dates" className="d-flex flex-column border">
                         {displayDates.map((week, index) => {
                             return (
-                                <div class="d-flex">
+                                <div className="d-flex">
                                     {week.map((date, index) => {
+                                        const dayAppts = appointments.filter(appt => appt.Date === date);
+
                                         let numberDisplay
+                                        let today = false
+                                        let available = false
+                                        let pastDate = false
                                         if (date === 0) { numberDisplay = '' }
                                         else { numberDisplay = date }
+                                        if (date === currentDate && displayMonth === currentMonth && displayYear === currentYear) {
+                                            today = true
+                                        }
+                                        if (dayAppts.length != 0) {
+                                            available = true
+                                        }
+                                        if (date < currentDate && displayMonth === currentMonth && displayYear === currentYear || displayMonth < currentMonth && displayYear === currentYear || displayYear < currentYear) {
+                                            pastDate = true
+                                        }
                                         return (
-                                            <div className="date">{numberDisplay}</div>
+                                            <div className={`px-1 date ${pastDate && 'pastDate'} ${today && 'currentDay'} ${!available && 'noAppts'}`}>{numberDisplay}</div>
                                         )
                                     })}
                                 </div>
