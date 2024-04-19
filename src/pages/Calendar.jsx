@@ -108,7 +108,7 @@ function CalendarDisplay() {
                     </div>
                 </div>
             </div>
-            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} />
+            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} />
         </div>
     );
 }
