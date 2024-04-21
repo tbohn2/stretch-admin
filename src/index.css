@@ -28,6 +28,11 @@
     background-position: center;
     height: 90vh;
     width: 90%;
+    overflow: auto;
+}
+
+.cloudBG::-webkit-scrollbar {
+    display: none;
 }
 
 nav label {
