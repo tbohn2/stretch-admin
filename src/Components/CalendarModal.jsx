@@ -125,10 +125,10 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
                                             <h2 className="fs-5">Time: {apptDetails.Time}</h2>
                                             {client &&
                                                 <div>
-                                                    <h2 className="fs-5">Client Information</h2>
-                                                    <h2 className="fs-5">Name: {client.Name}</h2>
-                                                    <h2 className="fs-5">Phone: {client.Phone}</h2>
-                                                    <h2 className="fs-5">Email: {client.Email}</h2>
+                                                    <p className="fs-5">Client Information</p>
+                                                    <p className="fs-5">Name: {client.Name}</p>
+                                                    <p className="fs-5">Phone: {client.Phone}</p>
+                                                    <p className="fs-5">Email: {client.Email}</p>
                                                 </div>
                                             }
                                             {status === 'Requested' &&
