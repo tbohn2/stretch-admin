@@ -12,6 +12,7 @@ function Clients() {
         const response = await fetch('http://localhost:5062/api/clients');
         const data = await response.json();
         setClients(data);
+        console.log(data);
     }
 
     const payBalance = async (clientId, price) => {
@@ -48,14 +49,14 @@ function Clients() {
         });
     }
 
-    const togglePastAppts = (appts, cliendId) => {
-        if (displayedPastAppts.length > 0) {
+    const togglePastAppts = (pastAppts, clientId) => {
+        if (clientId === displayClient) {
             setDisplayedPastAppts([]);
             setDisplayClient(0);
         }
         else {
-            setDisplayedPastAppts(appts);
-            setDisplayClient(cliendId);
+            setDisplayedPastAppts(pastAppts);
+            setDisplayClient(clientId);
         }
     }
 
@@ -66,8 +67,8 @@ function Clients() {
                 {clients.map((clientInfo) => {
                     const client = clientInfo.Client
                     const clientAppts = clientInfo.Appointments
-                    const pastAppts = sortAppts(clientAppts.filter((appt) => appt.Completed === true))
-                    const futureAppts = sortAppts(clientAppts.filter((appt) => appt.Completed === false))
+                    const pastAppts = sortAppts(clientAppts.filter((appt) => appt.Status === 3))
+                    const futureAppts = sortAppts(clientAppts.filter((appt) => appt.Status !== 3))
                     return (
                         <div key={client.Id} className="client-card my-2 py-2 col-5 pink-border d-flex flex-column align-items-center">
                             <div className="flex-grow-1 d-flex flex-column align-items-center">
@@ -75,13 +76,17 @@ function Clients() {
                                 <p>Email: {client.Email}</p>
                                 <p>Number: {client.Phone}</p>
                                 <h3 className="text-decoration-underline">Upcoming Appointments</h3>
-                                {futureAppts.map((appt) => (
-                                    <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
-                                        onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
-                                        <p className="col-5 fs-5 m-1 text-center">{appt.Month}/{appt.Date}/{appt.Year}</p>
-                                        <p className="col-5 fs-5 m-1 text-center">{appt.Time}</p>
-                                    </div>
-                                ))}
+                                {futureAppts.map((appt) => {
+                                    const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                    const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+                                    return (
+                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
+                                            onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
+                                            <p className="col-5 fs-5 m-1 text-center">{date}</p>
+                                            <p className="col-5 fs-5 m-1 text-center">{time}</p>
+                                        </div>
+                                    )
+                                })}
                             </div>
                             <h3>Balance: ${client.Balance}</h3>
                             <div className="d-flex justify-content-evenly col-12">
@@ -91,14 +96,18 @@ function Clients() {
                             {displayedPastAppts.length > 0 && displayClient === client.Id &&
                                 <div className="d-flex flex-column align-items-center col-10">
                                     <h3 className="text-decoration-underline">Past Appointments</h3>
-                                    {displayedPastAppts.map((appt) => (
-                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
-                                            onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
-                                            <p className="col-4 fs-5 m-1 text-center">{appt.Month}/{appt.Date}/{appt.Year}</p>
-                                            <p className="col-4 fs-5 m-1 text-center">{appt.Time}</p>
-                                            <p className="col-3 fs-5 m-1 text-center">${appt.Price}</p>
-                                        </div>
-                                    ))}
+                                    {displayedPastAppts.map((appt) => {
+                                        const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                        const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+                                        return (
+                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
+                                                onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
+                                                <p className="col-5 fs-5 m-1 text-center">{date}</p>
+                                                <p className="col-5 fs-5 m-1 text-center">{time}</p>
+                                                <p className="col-2 fs-5 m-1 text-center">${appt.Price}</p>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             }
                         </div>

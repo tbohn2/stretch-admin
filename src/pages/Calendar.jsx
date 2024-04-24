@@ -80,8 +80,8 @@ function CalendarDisplay() {
                             return (
                                 <div className="d-flex">
                                     {week.map((date, index) => {
-                                        const apptsForDay = appointments.filter(appt => appt.Date === date);
-
+                                        const apptsForDay = appointments.filter(appt => new Date(appt.DateTime).getDate() === date)
+                                            .sort((a, b) => new Date(a.DateTime) - new Date(b.DateTime));
                                         let numberDisplay
                                         let today = false
                                         let available = false

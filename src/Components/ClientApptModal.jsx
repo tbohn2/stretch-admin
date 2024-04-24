@@ -2,6 +2,8 @@ import React from "react";
 
 const ClientApptModal = ({ appt, clearAppt, refetch }) => {
 
+    const timeAndDate = new Date(appt.DateTime).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
     const completeAppt = async () => {
         try {
             const response = await fetch(`http://localhost:5062/api/completeAppt/`, {
@@ -38,7 +40,7 @@ const ClientApptModal = ({ appt, clearAppt, refetch }) => {
             <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div className="modal-content d-flex justify-content-between text-light">
                     <div id="modal-header" className="d-flex justify-content-between m-2">
-                        <h1 className="modal-title fs-3" id="clientApptModalLabel">{appt.Month}/{appt.Date}/{appt.Year} @ {appt.Time} </h1>
+                        <h1 className="modal-title fs-3" id="clientApptModalLabel">{timeAndDate}</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={clearAppt}></button>
                     </div>
                     <div id="modal-body" className="col-12 d-flex flex-column align-items-center flex-grow-1">
