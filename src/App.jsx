@@ -21,6 +21,11 @@ function App() {
     setClientsChecked(true);
   };
 
+  const handleLogout = () => {
+    auth.logout();
+    setLoggedIn(false);
+  }
+
   return (
     <Router>
       <div className='blueBG vh-100 col-12 d-flex justify-content-center align-items-center'>
@@ -35,6 +40,7 @@ function App() {
                 <input type="radio" className="" name="navOptions" id="option2" checked={clientsChecked} />
                 <label className="text-light" htmlFor="option2">CLIENTS</label>
               </Link>
+              <button className='custom-btn logout-btn danger-btn fs-5' onClick={() => handleLogout()}>Logout</button>
             </nav>
             <Routes>
               <Route exact path='/' element={<CalendarDisplay />} />
@@ -43,7 +49,7 @@ function App() {
             </Routes>
           </div>
           :
-          <Login />
+          <Login setLoggedIn={setLoggedIn} />
         }
       </div>
     </Router>

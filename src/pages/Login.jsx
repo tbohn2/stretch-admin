@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import auth from "../utils/auth";
 
-const Login = () => {
+const Login = ({ setLoggedIn }) => {
     const [username, setusername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -23,14 +23,11 @@ const Login = () => {
                 headers: { 'Content-Type': 'application/json' },
             });
             const data = await response.json();
-            console.log(data.token);
             auth.login(data.token)
+            setLoggedIn(true);
         } catch (error) {
             console.error(error);
         }
-    }
-
-    async function getAppointments() {
     }
 
     return (
