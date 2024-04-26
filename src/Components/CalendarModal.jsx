@@ -38,7 +38,6 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
             newHour += 12;
         }
         const newDateTime = `${year}-${month}-${date} ${newHour}:${newMinute}:00`;
-        console.log(newDateTime);
         try {
             const response = await fetch(`http://localhost:5062/api/newAppts/`, {
                 method: 'POST',
@@ -55,12 +54,11 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
     }
 
     const approveAppt = async () => {
-        console.log(JSON.stringify({ Id: apptDetails.Id }));
         try {
             const response = await fetch(`http://localhost:5062/api/approveAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             refetch();
@@ -75,7 +73,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
             const response = await fetch(`http://localhost:5062/api/denyAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             refetch();
@@ -90,7 +88,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
             const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: apptDetails.Id }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             refetch();
@@ -117,7 +115,6 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
                                 appt.Client && (client = appt.Client)
                                 const status = statuses[appt.Status]
                                 const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                                console.log(status);
 
                                 return (
                                     <div key={appt.Id} id={appt.Id} className="d-flex flex-column align-items-center col-11">
