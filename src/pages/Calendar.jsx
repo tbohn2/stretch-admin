@@ -83,14 +83,10 @@ function CalendarDisplay() {
                                         const apptsForDay = appointments.filter(appt => new Date(appt.DateTime).getDate() === date)
                                             .sort((a, b) => new Date(a.DateTime) - new Date(b.DateTime));
                                         let numberDisplay
-                                        let today = false
                                         let available = false
                                         let pastDate = false
                                         if (date === 0) { numberDisplay = '' }
                                         else { numberDisplay = date }
-                                        if (date === currentDate && displayMonth === currentMonth && displayYear === currentYear) {
-                                            today = true
-                                        }
                                         if (apptsForDay.length != 0) {
                                             available = true
                                         }
@@ -98,8 +94,17 @@ function CalendarDisplay() {
                                             pastDate = true
                                         }
                                         return (
-                                            <div className={`px-1 date ${pastDate && 'pastDate'} ${today && 'currentDay'} ${!available && 'noAppts'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
-                                                onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>{numberDisplay}</div>
+                                            <div className={`px-1 d-flex flex-column align-items-center date ${pastDate && 'pastDate'} ${!available && 'noAppts'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
+                                                onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>
+                                                <div className='align-self-start'>
+                                                    {numberDisplay}
+                                                </div>
+                                                {apptsForDay.length > 0 &&
+                                                    <div className='fs-3 d-flex justify-content-center align-items-center number-of-appts'>
+                                                        {apptsForDay.length}
+                                                    </div>
+                                                }
+                                            </div>
                                         )
                                     })}
                                 </div>
