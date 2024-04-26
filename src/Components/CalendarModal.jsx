@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import DropdownButton from "./DropdownButton";
+import auth from "../utils/auth";
 
 const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
+    const token = auth.getToken();
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const minutes = ['00', '15', '30', '45'];
     const statuses = ['Available', 'Requested', 'Booked', 'Completed'];
@@ -41,7 +43,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
             const response = await fetch(`http://localhost:5062/api/newAppts/`, {
                 method: 'POST',
                 body: JSON.stringify([{ DateTime: newDateTime }]),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             clearStates();

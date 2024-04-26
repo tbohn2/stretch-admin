@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import ClientApptModal from "../Components/ClientApptModal";
+import auth from "../utils/auth";
 
 function Clients() {
-
+    const token = auth.getToken()
     const [clients, setClients] = useState([]);
     const [displayedAppt, setDisplayedAppt] = useState({});
     const [displayedPastAppts, setDisplayedPastAppts] = useState([]);
     const [displayClient, setDisplayClient] = useState(0);
 
     const fetchClients = async () => {
-        const response = await fetch('http://localhost:5062/api/clients');
+        const response = await fetch('http://localhost:5062/api/clients', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await response.json();
         setClients(data);
-        console.log(data);
     }
 
     const payBalance = async (clientId, price) => {
@@ -20,7 +22,7 @@ function Clients() {
             const response = await fetch(`http://localhost:5062/api/adjustBalance/`, {
                 method: 'PUT',
                 body: JSON.stringify({ ClientId: clientId, Price: price }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             fetchClients();
@@ -114,7 +116,7 @@ function Clients() {
                     )
                 }
                 )}
-                <ClientApptModal appt={displayedAppt} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients} />
+                <ClientApptModal appt={displayedAppt} token={token} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients} />
             </div>
         </div>
     );

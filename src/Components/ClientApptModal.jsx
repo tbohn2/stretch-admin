@@ -1,6 +1,6 @@
 import React from "react";
 
-const ClientApptModal = ({ appt, clearAppt, refetch }) => {
+const ClientApptModal = ({ appt, token, clearAppt, refetch }) => {
 
     const timeAndDate = new Date(appt.DateTime).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -9,7 +9,7 @@ const ClientApptModal = ({ appt, clearAppt, refetch }) => {
             const response = await fetch(`http://localhost:5062/api/completeAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: appt.Id, Price: appt.Price, ClientId: appt.ClientId }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             refetch();
@@ -24,7 +24,7 @@ const ClientApptModal = ({ appt, clearAppt, refetch }) => {
             const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: appt.Id }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             console.log(response.status);
             refetch();
