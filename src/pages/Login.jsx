@@ -17,7 +17,8 @@ const Login = ({ setLoggedIn }) => {
         e.preventDefault();
         console.log(username, password);
         try {
-            const response = await fetch(`http://localhost:5062/api/login/`, {
+            // const response = await fetch(`http://localhost:5062/api/login/`, {
+            const response = await fetch(`http://tbohn2-001-site1.ctempurl.com/api/login/`, {
                 method: 'POST',
                 body: JSON.stringify({ Username: username, Password: password }),
                 headers: { 'Content-Type': 'application/json' },
