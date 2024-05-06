@@ -27,7 +27,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename='/stretch-admin'>
       <div className='blueBG vh-100 col-12 d-flex justify-content-center align-items-center'>
         {loggedIn ?
           <div className='cloudBG'>
