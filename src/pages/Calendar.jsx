@@ -17,6 +17,7 @@ function CalendarDisplay() {
 
     async function getAppointments() {
         try {
+            // const response = await fetch(`http://localhost:5062/api/apptsInMonth/${displayMonth}/${displayYear}`); for local testing
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/apptsInMonth/${displayMonth}/${displayYear}`);
             const data = await response.json();
             console.log(data);
@@ -58,14 +59,14 @@ function CalendarDisplay() {
 
 
     return (
-        <div className='text-light d-flex flex-column align-items-center'>
-            <div className=''>
-                <div id="calendar-header" className="d-flex justify-content-between align-items-center my-3">
+        <div className='col-12 my-3 text-light d-flex flex-column align-items-center'>
+            <div id="calendar" className="col-11 col-md-8 d-flex flex-column align-items-center">
+                <div id="calendar-header" className="col-12 d-flex justify-content-between align-items-center my-3">
                     <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>Prev</button>
                     <h1 id="month-year" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
                 </div>
-                <div id="calendar-body">
+                <div id="calendar-body" className='col-12'>
                     <div id="calendar-weekdays" className="d-flex justify-content-between">
                         <div>Sun</div>
                         <div>Mon</div>
@@ -83,22 +84,16 @@ function CalendarDisplay() {
                                         const apptsForDay = appointments.filter(appt => new Date(appt.DateTime).getDate() === date)
                                             .sort((a, b) => new Date(a.DateTime) - new Date(b.DateTime));
                                         let numberDisplay
-                                        let available = false
                                         let pastDate = false
                                         if (date === 0) { numberDisplay = '' }
                                         else { numberDisplay = date }
-                                        if (apptsForDay.length != 0) {
-                                            available = true
-                                        }
                                         if (date < currentDate && displayMonth === currentMonth && displayYear === currentYear || displayMonth < currentMonth && displayYear === currentYear || displayYear < currentYear) {
                                             pastDate = true
                                         }
                                         return (
-                                            <div className={`px-1 d-flex flex-column align-items-center date ${pastDate && 'pastDate'} ${!available && 'noAppts'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
+                                            <div className={`px-1 d-flex flex-column align-items-center date ${pastDate && 'pastDate'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
                                                 onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>
-                                                <div className='align-self-start'>
-                                                    {numberDisplay}
-                                                </div>
+                                                <div className='date-display'>{numberDisplay}</div>
                                                 {apptsForDay.length > 0 &&
                                                     <div className='fs-3 d-flex justify-content-center align-items-center number-of-appts'>
                                                         {apptsForDay.length}
@@ -112,6 +107,7 @@ function CalendarDisplay() {
                         })}
                     </div>
                 </div>
+                <div>Heo</div>
             </div>
             <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} />
         </div>

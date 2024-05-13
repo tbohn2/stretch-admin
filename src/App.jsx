@@ -30,7 +30,7 @@ function App() {
     <Router basename='/stretch-admin'>
       <div className='blueBG vh-100 col-12 d-flex justify-content-center align-items-center'>
         {loggedIn ?
-          <div className='cloudBG'>
+          <div className='cloudBG overflow-y-hidden'>
             <nav className='d-flex justify-content-evenly align-items-center'>
               <Link to='/calendar' className='text-light' onClick={handleCalendarClick}>
                 <input type="radio" className="" name="navOptions" id="option1" checked={calendarChecked} />

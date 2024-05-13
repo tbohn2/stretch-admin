@@ -60,7 +60,7 @@ input[type="radio"]:checked+label {
 }
 
 #calendar-weekdays div {
-    width: 125px;
+    width: 14.2857%;
 }
 
 .custom-btn {
@@ -76,13 +76,23 @@ input[type="radio"]:checked+label {
     transition: all 0.3s ease;
 }
 
+#calendar {
+    overflow-y: scroll;
+    height: 80vh;
+    position: relative;
+}
+
+#calendar::-webkit-scrollbar {
+    display: none;
+}
+
 .monthNavBtn {
     font-size: 24px;
     font-weight: 300;
 }
 
 .date {
-    width: 125px;
+    width: 14.2857%;
     height: 100px;
     font-size: 20px;
     position: relative;
@@ -96,6 +106,10 @@ input[type="radio"]:checked+label {
     box-shadow: 0 0 10px var(--pink);
     transition: all 0.3s ease;
     cursor: pointer;
+}
+
+.date-display {
+    align-self: flex-start;
 }
 
 .number-of-appts {
@@ -198,4 +212,28 @@ input[type="radio"]:checked+label {
 .danger-btn:hover {
     color: var(--white);
     background-color: var(--pink);
+}
+
+@media screen and (max-width: 768px) {
+    .logout-btn {
+        position: absolute;
+        right: 1%;
+        top: 1%;
+    }
+
+    .date {
+        height: 70px;
+    }
+
+    .date-display {
+        align-self: center;
+    }
+
+    .number-of-appts {
+        width: 25px;
+        height: 25px;
+        font-size: 15px;
+        font-weight: 400;
+    }
+
 }
