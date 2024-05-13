@@ -10,7 +10,7 @@ function Clients() {
     const [displayClient, setDisplayClient] = useState(0);
 
     const fetchClients = async () => {
-        const response = await fetch('http://localhost:5062/api/clients', {
+        const response = await fetch('https://tbohn2-001-site1.ctempurl.com/api/clients', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -19,7 +19,7 @@ function Clients() {
 
     const payBalance = async (clientId, price) => {
         try {
-            const response = await fetch(`http://localhost:5062/api/adjustBalance/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/adjustBalance/`, {
                 method: 'PUT',
                 body: JSON.stringify({ ClientId: clientId, Price: price }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

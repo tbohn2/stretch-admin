@@ -17,7 +17,7 @@ function CalendarDisplay() {
 
     async function getAppointments() {
         try {
-            const response = await fetch(`http://localhost:5062/api/apptsInMonth/${displayMonth}/${displayYear}`);
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/apptsInMonth/${displayMonth}/${displayYear}`);
             const data = await response.json();
             console.log(data);
             setAppointments(data);

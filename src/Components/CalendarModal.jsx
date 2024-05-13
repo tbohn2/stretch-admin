@@ -39,7 +39,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
         }
         const newDateTime = `${year}-${month}-${date} ${newHour}:${newMinute}:00`;
         try {
-            const response = await fetch(`http://localhost:5062/api/newAppts/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/newAppts/`, {
                 method: 'POST',
                 body: JSON.stringify([{ DateTime: newDateTime }]),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -55,7 +55,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
     const approveAppt = async () => {
         try {
-            const response = await fetch(`http://localhost:5062/api/approveAppt/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/approveAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -70,7 +70,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
     const denyAppt = async () => {
         try {
-            const response = await fetch(`http://localhost:5062/api/denyAppt/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/denyAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -85,7 +85,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
     const deleteAppt = async () => {
         try {
-            const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

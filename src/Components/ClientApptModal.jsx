@@ -6,7 +6,7 @@ const ClientApptModal = ({ appt, token, clearAppt, refetch }) => {
 
     const completeAppt = async () => {
         try {
-            const response = await fetch(`http://localhost:5062/api/completeAppt/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/completeAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: appt.Id, Price: appt.Price, ClientId: appt.ClientId }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -21,7 +21,7 @@ const ClientApptModal = ({ appt, token, clearAppt, refetch }) => {
 
     const deleteAppt = async () => {
         try {
-            const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: appt.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
