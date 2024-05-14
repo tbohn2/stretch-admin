@@ -14,16 +14,22 @@ function CalendarDisplay() {
     const [displayDates, setdisplayDates] = useState(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
     const [appointments, setAppointments] = useState([]);
     const [dayAppts, setDayAppts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     async function getAppointments() {
+        setLoading(true);
+        setError('');
         try {
-            // const response = await fetch(`http://localhost:5062/api/apptsInMonth/${displayMonth}/${displayYear}`); for local testing
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/apptsInMonth/${displayMonth}/${displayYear}`);
             const data = await response.json();
-            console.log(data);
-            setAppointments(data);
+            setLoading(false);
+            if (response.ok) { setAppointments(data) }
+            if (!response.ok) { setError(data) }
         } catch (error) {
             console.error(error);
+            setLoading(false);
+            setError('An error occurred while making request. Please try again later.');
         }
     }
 
@@ -66,6 +72,8 @@ function CalendarDisplay() {
                     <h1 id="month-year" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
                 </div>
+                {loading && <div className="spinner-border" role="status"></div>}
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div id="calendar-body" className='col-12'>
                     <div id="calendar-weekdays" className="d-flex justify-content-between">
                         <div>Sun</div>
@@ -95,7 +103,7 @@ function CalendarDisplay() {
                                                 onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>
                                                 <div className='date-display'>{numberDisplay}</div>
                                                 {apptsForDay.length > 0 &&
-                                                    <div className='fs-3 d-flex justify-content-center align-items-center number-of-appts'>
+                                                    <div className='d-flex justify-content-center align-items-center number-of-appts'>
                                                         {apptsForDay.length}
                                                     </div>
                                                 }
