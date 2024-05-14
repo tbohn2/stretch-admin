@@ -5,6 +5,7 @@ import auth from "../utils/auth";
 const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
     const token = auth.getToken();
+    const dateDisplay = new Date(year, month - 1, date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const minutes = ['00', '15', '30', '45'];
     const statuses = ['Available', 'Requested', 'Booked', 'Completed'];
@@ -14,6 +15,8 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
     const [newHourDisplay, setnewHourDisplay] = useState(12);
     const [newMinute, setNewMinute] = useState('00');
     const [newMeridiem, setNewMeridiem] = useState('AM');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const clearStates = () => {
         setnewHourDisplay(12);
@@ -32,6 +35,8 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
     }
 
     const addAppt = async () => {
+        setLoading(true);
+        setError('');
         // "DateTime": "2024-04-28 14:00:00"
         let newHour = newHourDisplay;
         if (newMeridiem === 'PM') {
@@ -44,57 +49,101 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
                 body: JSON.stringify([{ DateTime: newDateTime }]),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
-            clearStates();
-            refetch();
+            if (response.ok) {
+                setLoading(false);
+                clearStates();
+                refetch();
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
         }
         catch (error) {
             console.error(error);
+            setLoading(false);
+            setError('An error occurred while making request. Please try again later.');
         }
     }
 
     const approveAppt = async () => {
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/approveAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
-            refetch();
+            if (response.ok) {
+                setLoading(false);
+                clearStates();
+                refetch();
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
         }
         catch (error) {
             console.error(error);
+            setError('An error occurred while making request. Please try again later.');
+
         }
     }
 
     const denyAppt = async () => {
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/denyAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
-            refetch();
+            if (response.ok) {
+                setLoading(false);
+                clearStates();
+                refetch();
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
         }
         catch (error) {
             console.error(error);
+            setError('An error occurred while making request. Please try again later.');
+
         }
     }
 
     const deleteAppt = async () => {
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
-            refetch();
+            if (response.ok) {
+                setLoading(false);
+                clearStates();
+                refetch();
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
         }
         catch (error) {
             console.error(error);
+            setError('An error occurred while making request. Please try again later.');
         }
     }
 
@@ -104,11 +153,13 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
             <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div className="modal-content d-flex justify-content-between text-light">
                     <div id="modal-header" className="d-flex justify-content-between m-2">
-                        <h1 className="modal-title fs-3" id="apptsModalLabel"> {month}/{date}/{year}</h1>
+                        <h1 className="modal-title fs-3" id="apptsModalLabel">{dateDisplay}</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={clearStates}></button>
                     </div>
                     <div id="modal-body" className="col-12 d-flex flex-column align-items-center flex-grow-1">
                         {appointments.length === 0 && <h2 className="fs-5">No Appointments</h2>}
+                        {loading && <div className="spinner-border" role="status"></div>}
+                        {error && <div className="alert alert-danger">{error}</div>}
                         {appointments.sort((a, b) => new Date(a) - new Date(b))
                             .map((appt, index) => {
                                 let client
