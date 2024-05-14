@@ -117,9 +117,11 @@ input[type="radio"]:checked+label {
     position: relative;
     width: 50px;
     height: 50px;
+    font-size: 25px;
+
+    font-weight: 700;
     border-radius: 50%;
     z-index: 0;
-    font-weight: 700;
     background-image: radial-gradient(transparent 55%, var(--white) 60%, var(--pink) 75%);
     background-size: cover;
     background-position: center;
@@ -212,6 +214,10 @@ input[type="radio"]:checked+label {
 .danger-btn:hover {
     color: var(--white);
     background-color: var(--pink);
+}
+
+.spinner-border {
+    color: var(--pink);
 }
 
 @media screen and (max-width: 768px) {
