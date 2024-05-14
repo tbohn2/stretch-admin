@@ -157,6 +157,28 @@ input[type="radio"]:checked+label {
     border-image-repeat: stretch;
 }
 
+#clients {
+    overflow-y: scroll;
+    height: 85vh;
+    position: relative;
+}
+
+#clients::-webkit-scrollbar {
+    display: none;
+}
+
+input[type="text"] {
+    border: 1px solid var(--white);
+    border-image: linear-gradient(to left, var(--white), var(--pink));
+    border-image-slice: 1;
+    border-image-repeat: stretch;
+}
+
+input[type="text"]:focus {
+    border: 1px solid var(--pink);
+    outline: 1px solid var(--pink);
+}
+
 @keyframes fade-in {
     0% {
         opacity: 0;
@@ -176,7 +198,6 @@ input[type="radio"]:checked+label {
 .custom-dropdown {
     position: relative;
 }
-
 
 .custom-dropdown-menu {
     position: absolute;
@@ -204,7 +225,6 @@ input[type="radio"]:checked+label {
 .custom-dropdown-item:hover {
     background-color: var(--pink);
 }
-
 
 .success-btn:hover {
     color: var(--white);
