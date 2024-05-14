@@ -1,36 +1,58 @@
 import React from "react";
 
-const ClientApptModal = ({ appt, token, clearAppt, refetch }) => {
+const ClientApptModal = ({ appt, token, clearAppt, refetch, setLoading, setError, setSuccessMessage }) => {
 
     const timeAndDate = new Date(appt.DateTime).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     const completeAppt = async () => {
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/completeAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: appt.Id, Price: appt.Price, ClientId: appt.ClientId }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
+            if (response.ok) {
+                setSuccessMessage('Appointment Completed')
+                setTimeout(() => {
+                    setSuccessMessage('');
+                }, 2000);
+            }
+            if (!response.ok) {
+                setError('Failed to complete appointment')
+
+            }
             refetch();
         }
         catch (error) {
             console.error(error);
+            setError('An error occurred while making request. Please try again later.');
         }
     }
 
     const deleteAppt = async () => {
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: appt.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
+            if (response.ok) {
+                setSuccessMessage('Appointment Deleted')
+                setTimeout(() => {
+                    setSuccessMessage('');
+                }, 2000);
+            }
+            if (!response.ok) { setError('Failed to delete appointment') }
             refetch();
         }
         catch (error) {
             console.error(error);
+            setError('An error occurred while making request. Please try again later.');
+
         }
     }
 

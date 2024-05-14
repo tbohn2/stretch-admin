@@ -153,7 +153,8 @@ function Clients() {
                     )
                 }
                 )}
-                <ClientApptModal appt={displayedAppt} token={token} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients} />
+                <ClientApptModal appt={displayedAppt} token={token} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients}
+                    setLoading={setLoading} setError={setError} setSuccessMessage={setSuccessMessage} />
             </div>
         </div>
     );
