@@ -5,16 +5,30 @@ import auth from "../utils/auth";
 function Clients() {
     const token = auth.getToken()
     const [clients, setClients] = useState([]);
+    const [displayedClients, setDisplayedClients] = useState([]);
     const [displayedAppt, setDisplayedAppt] = useState({});
     const [displayedPastAppts, setDisplayedPastAppts] = useState([]);
     const [displayClient, setDisplayClient] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     const fetchClients = async () => {
-        const response = await fetch('https://tbohn2-001-site1.ctempurl.com/api/clients', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        setClients(data);
+        setLoading(true);
+        setError('');
+        try {
+            const response = await fetch('https://tbohn2-001-site1.ctempurl.com/api/clients', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) { setClients(data); setDisplayedClients(data) }
+            if (!response.ok) { setError(data) }
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+            setError('An error occurred while making request. Please try again later.');
+        }
     }
 
     const payBalance = async (clientId, price) => {
@@ -24,7 +38,13 @@ function Clients() {
                 body: JSON.stringify({ ClientId: clientId, Price: price }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
-            console.log(response.status);
+            if (response.ok) {
+                setSuccessMessage('Balance cleared')
+                setTimeout(() => {
+                    setSuccessMessage('');
+                }, 2000);
+            }
+            if (!response.ok) { setError('Failed to clear balance') }
             fetchClients();
         }
         catch (error) {
@@ -62,17 +82,34 @@ function Clients() {
         }
     }
 
+    const handleSearchChange = (e) => {
+        const search = e.target.value;
+        if (search === '') {
+            setDisplayedClients(clients);
+            return;
+        }
+        const filteredClients = clients.filter((client) => {
+            return client.Client.Name.toLowerCase().includes(search.toLowerCase()) || client.Client.Email.toLowerCase().includes(search.toLowerCase()) || client.Client.Phone.includes(search);
+        });
+        setDisplayedClients(filteredClients);
+    }
+
     return (
-        <div className="text-light d-flex flex-column align-items-center">
+        <div id='clients' className="pb-2 text-light d-flex flex-column align-items-center">
             <h1 className="fw-light my-2">Clients</h1>
+            {loading && <div className="spinner-border fade-in" role="status"></div>}
+            {error && <div className="alert alert-danger fade-in">{error}</div>}
+            {successMessage && <div className="alert alert-success fade-in">{successMessage}</div>}
+            {displayedClients.length === 0 && !loading && <div className="alert alert-info">No clients to display</div>}
+            <input type="text" placeholder="Search" onChange={handleSearchChange} />
             <div className="my-2 col-12 d-flex flex-wrap justify-content-evenly">
-                {clients.map((clientInfo) => {
+                {displayedClients.map((clientInfo) => {
                     const client = clientInfo.Client
                     const clientAppts = clientInfo.Appointments
                     const pastAppts = sortAppts(clientAppts.filter((appt) => appt.Status === 3))
                     const futureAppts = sortAppts(clientAppts.filter((appt) => appt.Status !== 3))
                     return (
-                        <div key={client.Id} className="client-card my-2 py-2 col-5 pink-border d-flex flex-column align-items-center">
+                        <div key={client.Id} className="client-card fade-in my-2 py-2 col-10 col-md-5 pink-border d-flex flex-column align-items-center">
                             <div className="flex-grow-1 d-flex flex-column align-items-center">
                                 <h3>{client.Name}</h3>
                                 <p>Email: {client.Email}</p>
