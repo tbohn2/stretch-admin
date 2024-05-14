@@ -20,21 +20,18 @@ const Login = ({ setLoggedIn }) => {
         setLoading(true);
         setError("");
         try {
-            const response = await fetch(`http://localhost:5062/api/login/`, {
-                // const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/login/`, {
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/login/`, {
                 method: 'POST',
                 body: JSON.stringify({ Username: username, Password: password }),
                 headers: { 'Content-Type': 'application/json' },
             });
             const data = await response.json();
             setLoading(false);
-            if (data.token) {
+            if (response.ok && data.token) {
                 auth.login(data.token)
                 setLoggedIn(true);
             }
-            if (!response.ok) {
-                setError(data);
-            }
+            if (!response.ok) { setError(data) }
         } catch (error) {
             setLoading(false);
             setError("An error occurred while making request. Please try again later.");
@@ -56,9 +53,7 @@ const Login = ({ setLoggedIn }) => {
                     <input type="password" className="form-control" id="password" onChange={handlePasswordChange} required />
                 </div>
                 {loading ?
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+                    <div class="spinner-border" role="status"></div>
                     :
                     <button type="submit" className="custom-btn col-6">Login</button>
                 }
