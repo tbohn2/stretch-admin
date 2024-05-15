@@ -123,21 +123,21 @@ const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear
                             })}
                         </div>
                         <h2 className="my-2">At</h2>
-                        <div className="d-flex fs-4 col-12 justify-content-center align-items-center">
+                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
                             <DropdownButton options={hours} newValue={newHourDisplay} setNewValue={setnewHourDisplay} />
                             <p>:</p>
                             <DropdownButton options={minutes} newValue={newMinute} setNewValue={setNewMinute} />
                             <DropdownButton options={["AM", "PM"]} newValue={newMeridiem} setNewValue={setNewMeridiem} />
                         </div>
                         <h2 className="my-2">From</h2>
-                        <div className="d-flex fs-4 col-12 justify-content-center align-items-center">
+                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
                             <DropdownButton options={months} newValue={startMonth} setNewValue={setstartMonth} />
                             <DropdownButton options={dates} newValue={startDate} setNewValue={setstartDate} />
                             <p>,</p>
                             <DropdownButton options={years} newValue={startYear} setNewValue={setstartYear} />
                         </div>
                         <h2 className="my-2">To</h2>
-                        <div className="d-flex fs-4 col-12 justify-content-center align-items-center">
+                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
                             <DropdownButton options={months} newValue={endMonth} setNewValue={setendMonth} />
                             <DropdownButton options={dates} newValue={endDate} setNewValue={setendDate} />
                             <p>,</p>

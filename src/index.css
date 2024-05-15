@@ -287,4 +287,11 @@ input[type="text"]:focus {
         font-weight: 400;
     }
 
+    input[type="checkbox"]+label {
+        width: 45px;
+        height: 45px;
+        font-size: 25px;
+        font-weight: 300;
+    }
+
 }
