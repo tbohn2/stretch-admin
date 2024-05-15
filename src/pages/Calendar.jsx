@@ -1,6 +1,7 @@
 import { Calendar } from 'node-calendar';
 import React, { useState, useEffect } from 'react';
 import CalendarModal from '../Components/CalendarModal';
+import NewApptsModal from '../Components/NewApptsModal';
 
 function CalendarDisplay() {
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
@@ -115,9 +116,10 @@ function CalendarDisplay() {
                         })}
                     </div>
                 </div>
-                <div>Heo</div>
+                <button id="newApptBtn" className="custom-btn" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
             </div>
             <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} />
+            <NewApptsModal refetch={getAppointments} />
         </div>
     );
 }
