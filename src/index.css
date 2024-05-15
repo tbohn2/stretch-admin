@@ -59,6 +59,31 @@ input[type="radio"]:checked+label {
     border-image-repeat: stretch;
 }
 
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]+label {
+    color: var(--white);
+    position: relative;
+    width: 50px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: 300;
+    border-radius: 50%;
+    z-index: 0;
+    background-image: radial-gradient(transparent 55%, var(--white) 60%, var(--pink) 75%);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked+label {
+    color: var(--pink);
+    position: relative;
+    background-image: radial-gradient(var(--white) 55%, var(--white) 60%, var(--pink) 75%);
+}
+
 #calendar-weekdays div {
     width: 14.2857%;
 }
@@ -118,7 +143,6 @@ input[type="radio"]:checked+label {
     width: 50px;
     height: 50px;
     font-size: 25px;
-
     font-weight: 700;
     border-radius: 50%;
     z-index: 0;
@@ -204,14 +228,15 @@ input[type="text"]:focus {
     top: 100%;
     border: 1px solid #cccccc;
     border-top: none;
-    width: 100%;
-    max-height: 150px;
+    /* width: 100%; */
+    max-height: 200px;
     overflow-y: auto;
     background-image: url('./assets/cloudBG.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
+    z-index: 1;
 }
 
 .custom-dropdown-menu::-webkit-scrollbar {

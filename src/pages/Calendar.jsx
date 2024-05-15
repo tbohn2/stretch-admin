@@ -116,10 +116,10 @@ function CalendarDisplay() {
                         })}
                     </div>
                 </div>
-                <button id="newApptBtn" className="custom-btn" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
+                <button id="newApptBtn" className="custom-btn my-3 fs-4" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
             </div>
             <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} />
-            <NewApptsModal refetch={getAppointments} />
+            <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} />
         </div>
     );
 }

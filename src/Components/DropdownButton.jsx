@@ -25,15 +25,15 @@ const DropdownButton = ({ newValue, setNewValue, options }) => {
     }, []);
 
     return (
-        <div className="custom-dropdown col-2 mx-1" ref={dropdownRef}>
-            <button className="custom-btn col-12" onClick={() => setIsOpen(!isOpen)}>
+        <div className="custom-dropdown mx-1" ref={dropdownRef}>
+            <button className="custom-btn col-12 px-2" onClick={() => setIsOpen(!isOpen)}>
                 {newValue}
             </button>
 
             {isOpen && (
                 <div className="custom-dropdown-menu d-flex flex-column">
                     {options.map((option, index) => (
-                        <div key={index} className="custom-dropdown-item col-12 text-center" onClick={() => handleOptionSelect(option)}>
+                        <div key={index} className="custom-dropdown-item px-2 text-center" onClick={() => handleOptionSelect(option)}>
                             {option}
                         </div>
                     ))}
