@@ -53,7 +53,7 @@ const Login = ({ setLoggedIn }) => {
                     <input type="password" className="form-control" id="password" onChange={handlePasswordChange} required />
                 </div>
                 {loading ?
-                    <div class="spinner-border" role="status"></div>
+                    <div className="spinner-border" role="status"></div>
                     :
                     <button type="submit" className="custom-btn col-6">Login</button>
                 }
