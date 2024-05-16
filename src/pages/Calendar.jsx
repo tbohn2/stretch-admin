@@ -70,7 +70,10 @@ function CalendarDisplay() {
             <div id="calendar" className="col-11 col-md-8 d-flex flex-column align-items-center">
                 <div id="calendar-header" className="col-12 d-flex justify-content-between align-items-center my-3">
                     <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>Prev</button>
-                    <h1 id="month-year" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
+                    <div className='d-flex flex-column align-items-center'>
+                        <h1 id="month" className="fw-light m-0">{months[displayMonth - 1]}</h1>
+                        <h1 id="year" className="fw-light m-0">{displayYear}</h1>
+                    </div>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
                 </div>
                 {loading && <div className="spinner-border" role="status"></div>}
