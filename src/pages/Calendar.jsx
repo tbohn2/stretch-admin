@@ -22,7 +22,7 @@ function CalendarDisplay() {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/apptsInMonth/${displayMonth}/${displayYear}`);
+            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/allAppts/${displayMonth}/${displayYear}`);
             const data = await response.json();
             setLoading(false);
             if (response.ok) { setAppointments(data) }
