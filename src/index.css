@@ -268,8 +268,8 @@ input[type="text"]:focus {
 @media screen and (max-width: 768px) {
     .logout-btn {
         position: absolute;
-        right: 1%;
-        top: 1%;
+        right: 0%;
+        top: 0%;
     }
 
     .date {

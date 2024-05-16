@@ -96,7 +96,6 @@ function Clients() {
 
     return (
         <div id='clients' className="pb-2 text-light d-flex flex-column align-items-center">
-            <h1 className="fw-light my-2">Clients</h1>
             {loading && <div className="spinner-border fade-in" role="status"></div>}
             {error && <div className="alert alert-danger fade-in">{error}</div>}
             {successMessage && <div className="alert alert-success fade-in">{successMessage}</div>}
@@ -106,44 +105,47 @@ function Clients() {
                 {displayedClients.map((clientInfo) => {
                     const client = clientInfo.Client
                     const clientAppts = clientInfo.Appointments
+                    const phone = client.Phone.includes('-') ? client.Phone : `${client.Phone.slice(0, 3)}-${client.Phone.slice(3, 6)}-${client.Phone.slice(6)}`
                     const pastAppts = sortAppts(clientAppts.filter((appt) => appt.Status === 3))
                     const futureAppts = sortAppts(clientAppts.filter((appt) => appt.Status !== 3))
                     return (
-                        <div key={client.Id} className="client-card fade-in my-2 py-2 col-10 col-md-5 pink-border d-flex flex-column align-items-center">
-                            <div className="flex-grow-1 d-flex flex-column align-items-center">
-                                <h3>{client.Name}</h3>
-                                <p>Email: {client.Email}</p>
-                                <p>Number: {client.Phone}</p>
-                                <h3 className="text-decoration-underline">Upcoming Appointments</h3>
+                        <div key={client.Id} className="client-card fade-in my-2 col-10 col-md-5 pink-border d-flex flex-column align-items-center">
+                            <div className="col-12 d-flex flex-column align-items-center border-bottom border-light">
+                                <h3 className="m-0">{client.Name}</h3>
+                                <p className="m-0">{client.Email}</p>
+                                <p className="m-0">{phone}</p>
+                                <h3 className="text-decoration-underline mx-1">Upcoming Appointments</h3>
+                                {futureAppts.length === 0 && <p>No upcoming appointments</p>}
                                 {futureAppts.map((appt) => {
-                                    const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                    const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                                     const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                     return (
-                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
+                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-evenly align-items-center col-10 col-lg-8 my-2"
                                             onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
-                                            <p className="col-5 fs-5 m-1 text-center">{date}</p>
-                                            <p className="col-5 fs-5 m-1 text-center">{time}</p>
+                                            <p className="fs-5 m-0 text-center">{date}</p>
+                                            <p className="fs-5 m-0 text-center">{time}</p>
                                         </div>
                                     )
                                 })}
                             </div>
                             <h3>Balance: ${client.Balance}</h3>
-                            <div className="d-flex justify-content-evenly col-12">
+                            <div className="d-flex justify-content-evenly col-12 my-2">
                                 <button className="custom-btn success-btn" onClick={() => payBalance(client.Id, client.Balance)}>Clear Balance</button>
-                                <button className="custom-btn" onClick={() => togglePastAppts(pastAppts, client.Id)}>See Past Appts</button>
+                                <button className="custom-btn" onClick={() => togglePastAppts(pastAppts, client.Id)}>{displayClient === client.Id ? 'Hide' : 'See'} Past Appts</button>
                             </div>
-                            {displayedPastAppts.length > 0 && displayClient === client.Id &&
-                                <div className="d-flex flex-column align-items-center col-10">
+                            {displayClient === client.Id &&
+                                <div className="d-flex flex-column align-items-center col-12">
                                     <h3 className="text-decoration-underline">Past Appointments</h3>
+                                    {displayedPastAppts.length === 0 && <p>No past appointments</p>}
                                     {displayedPastAppts.map((appt) => {
-                                        const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                        const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                                         const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                         return (
-                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-center align-items-center col-10 my-2"
+                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-between align-items-center col-10 col-lg-8 px-1 m-2"
                                                 onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
-                                                <p className="col-5 fs-5 m-1 text-center">{date}</p>
-                                                <p className="col-5 fs-5 m-1 text-center">{time}</p>
-                                                <p className="col-2 fs-5 m-1 text-center">${appt.Price}</p>
+                                                <p className="fs-5 my-1 text-center">{date}</p>
+                                                <p className="fs-5 my-1 text-center">{time}</p>
+                                                <p className="fs-5 my-1 text-center">${appt.Price}</p>
                                             </div>
                                         )
                                     })}
