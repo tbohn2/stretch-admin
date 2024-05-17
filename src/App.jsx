@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import CalendarDisplay from './pages/Calendar';
 import Clients from './pages/Clients';
@@ -10,6 +10,20 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(auth.loggedIn());
   const [calendarChecked, setCalendarChecked] = useState(true);
   const [clientsChecked, setClientsChecked] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setMobile(true);
+    }
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 768) {
+        setMobile(true);
+      } else {
+        setMobile(false);
+      }
+    });
+  }, []);
 
   const handleCalendarClick = () => {
     setCalendarChecked(true);
@@ -43,8 +57,8 @@ function App() {
               <button className='custom-btn logout-btn danger-btn fs-5' onClick={() => handleLogout()}>Logout</button>
             </nav>
             <Routes>
-              <Route exact path='/' element={<CalendarDisplay />} />
-              <Route exact path='/calendar' element={<CalendarDisplay />} />
+              <Route exact path='/' element={<CalendarDisplay mobile={mobile} />} />
+              <Route exact path='/calendar' element={<CalendarDisplay mobile={mobile} />} />
               <Route exact path='/clients' element={<Clients />} />
             </Routes>
           </div>

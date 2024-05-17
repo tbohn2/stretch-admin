@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import CalendarModal from '../Components/CalendarModal';
 import NewApptsModal from '../Components/NewApptsModal';
 
-function CalendarDisplay() {
+function CalendarDisplay({ mobile }) {
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
     const currentDate = new Date().getDate();
     const currentYear = new Date().getFullYear();
@@ -70,9 +70,9 @@ function CalendarDisplay() {
             <div id="calendar" className="col-11 col-md-8 d-flex flex-column align-items-center">
                 <div id="calendar-header" className="col-12 d-flex justify-content-between align-items-center my-3">
                     <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>Prev</button>
-                    <div className='d-flex flex-column align-items-center'>
-                        <h1 id="month" className="fw-light m-0">{months[displayMonth - 1]}</h1>
-                        <h1 id="year" className="fw-light m-0">{displayYear}</h1>
+                    <div className={`d-flex ${mobile && 'flex-column'} align-items-center`}>
+                        <h1 id="month" className="fw-light mx-2 my-0">{months[displayMonth - 1]}</h1>
+                        <h1 id="year" className="fw-light mx-2 my-0">{displayYear}</h1>
                     </div>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
                 </div>
