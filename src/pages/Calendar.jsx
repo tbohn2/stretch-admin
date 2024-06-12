@@ -22,7 +22,7 @@ function CalendarDisplay({ mobile }) {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/allAppts/${displayMonth}/${displayYear}`);
+            const response = await fetch(`http://localhost:5062/api/allAppts/${displayMonth}/${displayYear}`);
             const data = await response.json();
             setLoading(false);
             if (response.ok) { setAppointments(data) }
@@ -66,20 +66,17 @@ function CalendarDisplay({ mobile }) {
 
 
     return (
-        <div className='col-12 my-3 text-light d-flex flex-column align-items-center'>
-            <div id="calendar" className="col-11 col-md-8 d-flex flex-column align-items-center">
-                <div id="calendar-header" className="col-12 d-flex justify-content-between align-items-center my-3">
-                    <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>Prev</button>
-                    <div className={`d-flex ${mobile && 'flex-column'} align-items-center`}>
-                        <h1 id="month" className="fw-light mx-2 my-0">{months[displayMonth - 1]}</h1>
-                        <h1 id="year" className="fw-light mx-2 my-0">{displayYear}</h1>
-                    </div>
-                    <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>Next</button>
+        <div className='my-3 col-12 d-flex justify-content-center fade-in'>
+            <div id="calendar" className="bg-gray rounded p-5 col-11 col-md-10 col-xl-9 d-flex flex-column align-items-center">
+                <div id="calendar-header" className="col-12 bg-white d-flex align-items-center">
+                    <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>&#8592;</button>
+                    <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>&#8594;</button>
+                    <h1 id="month" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
                 </div>
                 {loading && <div className="spinner-border" role="status"></div>}
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div id="calendar-body" className='col-12'>
-                    <div id="calendar-weekdays" className="d-flex justify-content-between">
+                <div id="calendar-body" className='col-12 bg-white'>
+                    <div id="calendar-weekdays" className="d-flex justify-content-between col-12">
                         <div>Sun</div>
                         <div>Mon</div>
                         <div>Tue</div>
@@ -88,29 +85,50 @@ function CalendarDisplay({ mobile }) {
                         <div>Fri</div>
                         <div>Sat</div>
                     </div>
-                    <div id="calendar-dates" className="d-flex flex-column border">
+                    <div id="calendar-dates" className="d-flex flex-column col-12">
                         {displayDates.map((week, index) => {
                             return (
-                                <div className="d-flex">
+                                <div className="d-flex col-12 fade-in">
                                     {week.map((date, index) => {
                                         const apptsForDay = appointments.filter(appt => new Date(appt.DateTime).getDate() === date)
                                             .sort((a, b) => new Date(a.DateTime) - new Date(b.DateTime));
                                         let numberDisplay
-                                        let pastDate = false
+
                                         if (date === 0) { numberDisplay = '' }
                                         else { numberDisplay = date }
-                                        if (date < currentDate && displayMonth === currentMonth && displayYear === currentYear || displayMonth < currentMonth && displayYear === currentYear || displayYear < currentYear) {
-                                            pastDate = true
-                                        }
+
                                         return (
-                                            <div className={`px-1 d-flex flex-column align-items-center date ${pastDate && 'pastDate'}`} data-bs-toggle="modal" data-bs-target="#apptsModal"
-                                                onClick={() => { setDayAppts(apptsForDay); setDisplayDate(date) }}>
+                                            <div className="px-1 d-flex flex-column align-items-center date"
+                                                {...(mobile && {
+                                                    "data-bs-toggle": "modal",
+                                                    "data-bs-target": "#apptsModal",
+                                                    onClick: () => {
+                                                        setDayAppts(apptsForDay);
+                                                        setDisplayDate(date);
+                                                    },
+                                                })}>
                                                 <div className='date-display'>{numberDisplay}</div>
-                                                {apptsForDay.length > 0 &&
-                                                    <div className='d-flex justify-content-center align-items-center number-of-appts'>
-                                                        {apptsForDay.length}
-                                                    </div>
-                                                }
+                                                <div className={`col-12 ${mobile ? 'd-flex justify-content-center flex-wrap' : 'appts-container'}`}>
+                                                    {apptsForDay.length > 0 &&
+                                                        mobile ?
+                                                        apptsForDay.map((appt, index) => {
+                                                            return (
+                                                                <div className='appt-dot'>.</div>
+                                                            )
+                                                        })
+                                                        :
+                                                        apptsForDay.map((appt, index) => {
+                                                            const apptName = appt.apptType ? appt.apptType.Name : 'Available';
+                                                            const apptTime = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                                                            return (
+                                                                <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts(appt); setDisplayDate(date) }}>
+                                                                    {apptTime} {apptName}
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
                                             </div>
                                         )
                                     })}
