@@ -20,7 +20,7 @@ const Login = ({ setLoggedIn }) => {
         setLoading(true);
         setError("");
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/login/`, {
+            const response = await fetch(`http://localhost:5062/api/login/`, {
                 method: 'POST',
                 body: JSON.stringify({ Username: username, Password: password }),
                 headers: { 'Content-Type': 'application/json' },
@@ -40,7 +40,7 @@ const Login = ({ setLoggedIn }) => {
     }
 
     return (
-        <div className="d-flex flex-column align-items-center col-10 col-md-6 text-light fs-3">
+        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center col-10 col-md-6 text-light fs-3">
             <h1>Login</h1>
             {error && <div className="fs-4 alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit} className="col-12 d-flex flex-column align-items-center">
