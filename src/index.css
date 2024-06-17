@@ -17,6 +17,10 @@
     background-color: var(--gray);
 }
 
+.text-darkgray {
+    color: var(--darkgray);
+}
+
 .pink-border {
     border: 2px solid;
     border-image: linear-gradient(to left, var(--white), var(--pink));
@@ -139,6 +143,11 @@ input[type="checkbox"]:checked+label {
     align-self: flex-start;
 }
 
+.date-display:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .appts-container {
     height: 70%;
     overflow-y: auto;
@@ -174,13 +183,20 @@ input[type="checkbox"]:checked+label {
 }
 
 .appt-card {
-    color: var(--white);
+    color: var(--darkgray);
     cursor: pointer;
 }
 
 .appt-card:hover {
     box-shadow: 0 0 10px var(--pink);
     transition: all 0.3s ease;
+}
+
+.btn-close {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    color: var(--white) !important;
 }
 
 .appt-details {
@@ -288,6 +304,11 @@ input[type="text"]:focus {
 
     .date-display {
         align-self: center;
+    }
+
+    .date-display:hover {
+        cursor: none;
+        text-decoration: none;
     }
 
     input[type="checkbox"]+label {

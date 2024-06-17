@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DropdownButton from "./DropdownButton";
 import auth from "../utils/auth";
 
 const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
+    // if appointments is one, open dropdown with extra info
     const token = auth.getToken();
     const dateDisplay = new Date(year, month - 1, date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -19,11 +20,15 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        setApptDetails(appointments.length === 1 ? appointments[0] : null);
+    }, [appointments]);
+
     const clearStates = () => {
         setnewHourDisplay(12);
         setNewMinute('00');
         setNewMeridiem('AM');
-        setApptDetails(null);
+        setApptDetails(appointments.length === 1 ? appointments[0] : null);
         setAddingAppts(false);
         setDeletingAppt(false);
     }
@@ -50,7 +55,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
         }
         const newDateTime = `${year}-${month}-${date} ${newHour}:${newMinute}:00`;
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/newAppts/`, {
+            const response = await fetch(`http://localhost:5062/api/newAppts/`, {
                 method: 'POST',
                 body: JSON.stringify([{ DateTime: newDateTime }]),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -77,7 +82,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/approveAppt/`, {
+            const response = await fetch(`http://localhost:5062/api/approveAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -104,7 +109,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/denyAppt/`, {
+            const response = await fetch(`http://localhost:5062/api/denyAppt/`, {
                 method: 'PUT',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -132,7 +137,7 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
         setDeletingAppt(false);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
+            const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: apptDetails.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -157,18 +162,32 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
     return (
         <div className="modal fade" id="apptsModal" tabIndex="-1" aria-labelledby="apptsModalLabel"
             aria-hidden="true">
-            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div className="modal-content d-flex justify-content-between text-light">
-                    <div id="modal-header" className="d-flex justify-content-between m-2">
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content d-flex justify-content-between">
+                    <div id="modal-header" className="rounded-top p-1 text-center">
                         <h1 className="modal-title fs-3" id="apptsModalLabel">{dateDisplay}</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={clearStates}></button>
                     </div>
-                    <div id="modal-body" className="col-12 d-flex flex-column align-items-center flex-grow-1">
-                        {appointments.length === 0 && <h2 className="fs-5">No Appointments</h2>}
+                    <div id="modal-body" className="mt-2 col-12 d-flex flex-column align-items-center flex-grow-1 text-darkgray">
+                        {appointments.length === 0 && !addingAppts && <h2 className="fs-5">Add Appointments Below</h2>}
                         {loading && <div className="spinner-border" role="status"></div>}
                         {error && <div className="alert alert-danger">{error}</div>}
-                        {appointments.sort((a, b) => new Date(a) - new Date(b))
-                            .map((appt, index) => {
+                        {addingAppts ?
+                            <div className="mt-2 fs-4 col-11 pink-border d-flex flex-column align-items-center">
+                                <h2>Add Available Time</h2>
+                                <div className="d-flex col-12 justify-content-center align-items-center">
+                                    <DropdownButton options={hours} newValue={newHourDisplay} setNewValue={setnewHourDisplay} />
+                                    <p>:</p>
+                                    <DropdownButton options={minutes} newValue={newMinute} setNewValue={setNewMinute} />
+                                    <DropdownButton options={["AM", "PM"]} newValue={newMeridiem} setNewValue={setNewMeridiem} />
+                                </div>
+                                <div className="d-flex justify-content-evenly col-12">
+                                    <button type="button" className="custom-btn success-btn fs-5 my-2" data-bs-dismiss="modal" onClick={addAppt}>Confirm Time</button>
+                                    <button type="button" className="custom-btn danger-btn fs-5 my-2" onClick={clearStates}>Cancel</button>
+                                </div>
+                            </div>
+                            :
+                            appointments.map((appt, index) => {
                                 let client
                                 appt.Client && (client = appt.Client)
                                 const status = statuses[appt.Status]
@@ -220,24 +239,9 @@ const CalendarModal = ({ appointments, date, month, year, refetch }) => {
                                     </div>
                                 )
                             })}
-                        {addingAppts &&
-                            <div className="mt-2 fs-4 col-11 pink-border d-flex flex-column align-items-center">
-                                <h2>Add Available Time</h2>
-                                <div className="d-flex col-12 justify-content-center align-items-center">
-                                    <DropdownButton options={hours} newValue={newHourDisplay} setNewValue={setnewHourDisplay} />
-                                    <p>:</p>
-                                    <DropdownButton options={minutes} newValue={newMinute} setNewValue={setNewMinute} />
-                                    <DropdownButton options={["AM", "PM"]} newValue={newMeridiem} setNewValue={setNewMeridiem} />
-                                </div>
-                                <div className="d-flex justify-content-evenly col-12">
-                                    <button type="button" className="custom-btn success-btn fs-5 my-2" data-bs-dismiss="modal" onClick={addAppt}>Confirm Time</button>
-                                    <button type="button" className="custom-btn danger-btn fs-5 my-2" onClick={clearStates}>Cancel</button>
-                                </div>
-                            </div>
-                        }
-                        <button type="button" className="custom-btn fs-5 mt-3" onClick={() => setAddingAppts(true)}>Add Time Slot</button>
                     </div>
                     <div id="modal-footer" className="d-flex align-self-end justify-content-end mt-2">
+                        <button type="button" className="custom-btn fs-5 m-1" onClick={() => setAddingAppts(true)}>Add Time Slot</button>
                         <button type="button" className="custom-btn fs-5 m-1" data-bs-dismiss="modal" onClick={clearStates}>Close</button>
                     </div>
                 </div>

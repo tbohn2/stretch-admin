@@ -98,16 +98,20 @@ function CalendarDisplay({ mobile }) {
                                         else { numberDisplay = date }
 
                                         return (
-                                            <div className="px-1 d-flex flex-column align-items-center date"
+                                            <div className="px-1 d-flex flex-column align-items-center date" data-bs-toggle="modal" data-bs-target="#apptsModal"
                                                 {...(mobile && {
-                                                    "data-bs-toggle": "modal",
-                                                    "data-bs-target": "#apptsModal",
                                                     onClick: () => {
                                                         setDayAppts(apptsForDay);
                                                         setDisplayDate(date);
                                                     },
                                                 })}>
-                                                <div className='date-display'>{numberDisplay}</div>
+                                                <div className='date-display'
+                                                    {...(!mobile && {
+                                                        onClick: () => {
+                                                            setDayAppts([]);
+                                                            setDisplayDate(date);
+                                                        },
+                                                    })}>{numberDisplay}</div>
                                                 <div className={`col-12 ${mobile ? 'd-flex justify-content-center flex-wrap' : 'appts-container'}`}>
                                                     {apptsForDay.length > 0 &&
                                                         mobile ?
@@ -122,7 +126,7 @@ function CalendarDisplay({ mobile }) {
                                                             const apptTime = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
                                                             return (
-                                                                <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts(appt); setDisplayDate(date) }}>
+                                                                <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts([appt]); setDisplayDate(date) }}>
                                                                     {apptTime} {apptName}
                                                                 </div>
                                                             )
