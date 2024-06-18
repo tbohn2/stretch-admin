@@ -192,6 +192,10 @@ input[type="checkbox"]:checked+label {
     transition: all 0.3s ease;
 }
 
+textarea {
+    min-height: 200px;
+}
+
 .btn-close {
     position: absolute;
     top: 3px;
@@ -205,6 +209,10 @@ input[type="checkbox"]:checked+label {
     border-image: linear-gradient(to left, var(--white), var(--pink));
     border-image-slice: 1;
     border-image-repeat: stretch;
+}
+
+.service-button {
+    cursor: pointer;
 }
 
 #clients {
