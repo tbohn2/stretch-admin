@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
-const ClientApptModal = ({ appt, token, clearAppt, refetch, setLoading, setError, setSuccessMessage }) => {
+const ClientApptModal = ({ appt, clearAppt, refetch, setLoading, setError, setSuccessMessage }) => {
+
+    const token = auth.getToken();
 
     const [deletingAppt, setDeletingAppt] = useState(false);
 
@@ -8,12 +10,13 @@ const ClientApptModal = ({ appt, token, clearAppt, refetch, setLoading, setError
     const time = new Date(appt.DateTime).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' });
 
     const completeAppt = async () => {
+        // The price must be included under ApptType of Appointment
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/completeAppt/`, {
+            const response = await fetch(`http://localhost:5062/api/completeAppt/`, {
                 method: 'PUT',
-                body: JSON.stringify({ Id: appt.Id, Price: appt.Price, ClientId: appt.ClientId }),
+                body: JSON.stringify({ Id: appt.Id, Price: appt.ApptType.Price, ClientId: appt.ClientId }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
@@ -43,7 +46,7 @@ const ClientApptModal = ({ appt, token, clearAppt, refetch, setLoading, setError
         setDeletingAppt(false);
         setError('');
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/deleteAppt/`, {
+            const response = await fetch(`http://localhost:5062/api/deleteAppt/`, {
                 method: 'DELETE',
                 body: JSON.stringify({ Id: appt.Id }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

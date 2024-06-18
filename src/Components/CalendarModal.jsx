@@ -4,7 +4,6 @@ import auth from "../utils/auth";
 
 const CalendarModal = ({ appointments, date, month, year, refetch }) => {
 
-    // if appointments is one, open dropdown with extra info
     const token = auth.getToken();
     const dateDisplay = new Date(year, month - 1, date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
