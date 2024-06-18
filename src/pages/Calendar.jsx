@@ -2,13 +2,17 @@ import { Calendar } from 'node-calendar';
 import React, { useState, useEffect } from 'react';
 import CalendarModal from '../Components/CalendarModal';
 import NewApptsModal from '../Components/NewApptsModal';
+import ServicesModal from '../Components/ServiceModal';
+import auth from '../utils/auth';
 
 function CalendarDisplay({ mobile }) {
+    const token = auth.getToken();
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
     const currentDate = new Date().getDate();
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
+    const [services, setServices] = useState([]);
     const [displayDate, setDisplayDate] = useState(currentDate);
     const [displayMonth, setDisplayMonth] = useState(currentMonth);
     const [displayYear, setDisplayYear] = useState(currentYear);
@@ -18,11 +22,38 @@ function CalendarDisplay({ mobile }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const getServices = async () => {
+        try {
+            const cachedServices = localStorage.getItem('services');
+            if (cachedServices) {
+                setServices(JSON.parse(cachedServices));
+                return;
+            }
+
+            const response = await fetch(`http://localhost:5062/api/allServices`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+            if (response.ok) {
+                const services = await response.json();
+                localStorage.setItem('services', JSON.stringify(services));
+                setServices(services);
+            } else {
+                setError('Server request failed to retrieve services. Please try again later.');
+                console.error('Server request failed');
+            }
+        } catch (error) {
+            setError('Server request failed to retrieve services. Please try again later.');
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        getServices();
+    }, []);
+
     async function getAppointments() {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`http://localhost:5062/api/allAppts/${displayMonth}/${displayYear}`);
+            const response = await fetch(`http://localhost:5062/api/allAppts/${displayMonth}/${displayYear}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
             const data = await response.json();
             setLoading(false);
             if (response.ok) { setAppointments(data) }
@@ -72,9 +103,9 @@ function CalendarDisplay({ mobile }) {
                     <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>&#8592;</button>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>&#8594;</button>
                     <h1 id="month" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
+                    {loading && <div className="spinner-border" role="status"></div>}
+                    {error && <div className="alert alert-danger mx-2 my-0 p-2">{error}</div>}
                 </div>
-                {loading && <div className="spinner-border" role="status"></div>}
-                {error && <div className="alert alert-danger">{error}</div>}
                 <div id="calendar-body" className='col-12 bg-white'>
                     <div id="calendar-weekdays" className="d-flex justify-content-between col-12">
                         <div>Sun</div>
@@ -141,10 +172,14 @@ function CalendarDisplay({ mobile }) {
                         })}
                     </div>
                 </div>
-                <button id="newApptBtn" className="custom-btn my-3 fs-4" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
+                <div className='col-12 mt-3 d-flex justify-content-evenly'>
+                    <button id="newApptBtn" className="custom-btn fs-4" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
+                    <button id="newApptBtn" className="custom-btn fs-4" data-bs-toggle="modal" data-bs-target="#servicesModal">Edit Services</button>
+                </div>
             </div>
-            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} />
-            <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} />
+            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
+            <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
+            <ServicesModal services={services} getServices={getServices} />
         </div>
     );
 }
