@@ -27,8 +27,8 @@ const Login = ({ setLoggedIn }) => {
             });
             const data = await response.json();
             setLoading(false);
-            if (response.ok && data.token) {
-                auth.login(data.token)
+            if (response.ok && data.token && data.id) {
+                auth.login(data)
                 setLoggedIn(true);
             }
             if (!response.ok) { setError(data) }
