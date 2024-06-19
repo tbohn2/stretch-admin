@@ -129,7 +129,7 @@ function CalendarDisplay({ mobile }) {
                                         else { numberDisplay = date }
 
                                         return (
-                                            <div className="px-1 d-flex flex-column align-items-center date" data-bs-toggle="modal" data-bs-target="#apptsModal"
+                                            <div className="px-1 d-flex flex-column align-items-center date" data-bs-toggle={mobile ? "modal" : ""} data-bs-target={mobile ? "#apptsModal" : ""}
                                                 {...(mobile && {
                                                     onClick: () => {
                                                         setDayAppts(apptsForDay);
@@ -137,6 +137,7 @@ function CalendarDisplay({ mobile }) {
                                                     },
                                                 })}>
                                                 <div className='date-display'
+                                                    data-bs-toggle={mobile ? "" : "modal"} data-bs-target={mobile ? "" : "#apptsModal"}
                                                     {...(!mobile && {
                                                         onClick: () => {
                                                             setDayAppts([]);
@@ -177,7 +178,7 @@ function CalendarDisplay({ mobile }) {
                     <button id="newApptBtn" className="custom-btn fs-4" data-bs-toggle="modal" data-bs-target="#servicesModal">Edit Services</button>
                 </div>
             </div>
-            <CalendarModal appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
+            <CalendarModal services={services} appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
             <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
             <ServicesModal services={services} getServices={getServices} />
         </div>
