@@ -8,6 +8,7 @@ import auth from '../utils/auth';
 function CalendarDisplay({ mobile }) {
     const token = auth.getToken();
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+    const statuses = ['Available', 'Requested', 'Booked', 'Completed', 'Firm'];
     const currentDate = new Date().getDate();
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -154,12 +155,20 @@ function CalendarDisplay({ mobile }) {
                                                         })
                                                         :
                                                         apptsForDay.map((appt, index) => {
+                                                            let display = ''
+                                                            if (appt.Status === 2 || appt.Status === 4) {
+                                                                const apptType = services.find(service => service.Id === appt.ApptTypeId)
+                                                                console.log(apptType);
+                                                                display = apptType.Name
+                                                            } else {
+                                                                display = statuses[appt.Status]
+                                                            }
                                                             const apptName = appt.apptType ? appt.apptType.Name : 'Available';
                                                             const apptTime = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
                                                             return (
                                                                 <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts([appt]); setDisplayDate(date) }}>
-                                                                    {apptTime} {apptName}
+                                                                    {apptTime} {display}
                                                                 </div>
                                                             )
                                                         })

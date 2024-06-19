@@ -9,7 +9,7 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
     const dateDisplay = new Date(year, month - 1, date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const minutes = ['00', '15', '30', '45'];
-    const statuses = ['Available', 'Requested', 'Booked', 'Completed'];
+    const statuses = ['Available', 'Requested', 'Booked', 'Completed', 'Firm'];
     const initialFormState = { Hour: 12, Minutes: '00', MeridiemAM: true, ApptTypeId: 0 };
 
     const [newApptDetails, setNewApptDetails] = useState(initialFormState);
@@ -216,20 +216,26 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
                             appointments.map((appt, index) => {
                                 let client
                                 appt.Client && (client = appt.Client)
-
-                                const status = statuses[appt.Status]
+                                let display = ''
+                                if (appt.Status === 2 || appt.Status === 4) {
+                                    const apptType = services.find(service => service.Id === appt.ApptTypeId)
+                                    console.log(apptType);
+                                    display = apptType.Name
+                                } else {
+                                    display = statuses[appt.Status]
+                                }
                                 const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
                                 return (
                                     <div key={appt.Id} id={appt.Id} className="d-flex flex-column align-items-center col-11">
                                         <div className="appt-card col-12 pink-border px-1 mt-3 d-flex align-items-center" onClick={() => toggleDetails(appt)}>
                                             <h2 className="fs-5 my-1 col-3">{time}</h2>
-                                            <h2 className="fs-5 my-1 col-6 text-center">{status}</h2>
+                                            <h2 className="fs-5 my-1 col-6 text-center">{display}</h2>
                                             <h2 className="my-1 col-3"></h2>
                                         </div>
                                         {apptDetails === appt &&
                                             <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
-                                                <h2 className="fs-5">Status: {status}</h2>
+                                                <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
                                                 <h2 className="fs-5">Time: {time}</h2>
                                                 {client &&
                                                     <div className="my-2">
