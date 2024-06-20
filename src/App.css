@@ -1,0 +1,174 @@
+:root {
+    --pink: #db624c;
+    --white: #e7f3f7;
+    --gray: #e6e6e6;
+    --darkgray: #838383;
+    --lav: #D1C4E9;
+    --purple: #585C7E;
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+}
+
+.bg-white {
+    background-color: var(--white);
+}
+
+.bg-gray {
+    background-color: var(--gray);
+}
+
+.text-darkgray {
+    color: var(--darkgray);
+}
+
+.pink-border {
+    border: 2px solid;
+    border-image: linear-gradient(to left, var(--white), var(--pink));
+    border-image-slice: 1;
+    border-image-repeat: stretch;
+}
+
+.blueBG {
+    background-image: url('./assets/blueBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.cloudBG {
+    background-image: url('./assets/cloudBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    overflow: auto;
+}
+
+.cloudBG::-webkit-scrollbar {
+    display: none;
+}
+
+nav label {
+    font-size: 32px;
+    font-weight: 100;
+    cursor: pointer;
+    border-top: 7px solid transparent;
+}
+
+.logout-btn {
+    position: absolute;
+    right: 7%;
+    top: 6%;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked+label {
+    border-top: 7px solid;
+    border-image: linear-gradient(to left, var(--white), var(--pink));
+    border-image-slice: 1;
+    border-image-repeat: stretch;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]+label {
+    color: var(--white);
+    position: relative;
+    width: 50px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: 300;
+    border-radius: 50%;
+    z-index: 0;
+    background-image: radial-gradient(transparent 55%, var(--white) 60%, var(--pink) 75%);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked+label {
+    color: var(--pink);
+    position: relative;
+    background-image: radial-gradient(var(--white) 55%, var(--white) 60%, var(--pink) 75%);
+}
+
+#modal-header {
+    border-bottom: 1px solid var(--darkgray);
+    color: var(--white);
+    background-color: var(--purple);
+}
+
+textarea {
+    min-height: 200px;
+}
+
+.btn-close {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    color: var(--white) !important;
+}
+
+input[type="text"] {
+    border: 1px solid var(--white);
+    border-image: linear-gradient(to left, var(--white), var(--pink));
+    border-image-slice: 1;
+    border-image-repeat: stretch;
+}
+
+input[type="text"]:focus {
+    border: 1px solid var(--pink);
+    outline: 1px solid var(--pink);
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fade-in 0.25s ease-in-out;
+}
+
+.success-btn:hover {
+    color: var(--white);
+    background-color: rgb(107, 209, 107);
+}
+
+.danger-btn:hover {
+    color: var(--white);
+    background-color: var(--pink);
+}
+
+.spinner-border {
+    color: var(--pink);
+}
+
+@media screen and (max-width: 768px) {
+    .logout-btn {
+        position: absolute;
+        right: 0%;
+        top: 0%;
+    }
+
+    input[type="checkbox"]+label {
+        width: 45px;
+        height: 45px;
+        font-size: 25px;
+        font-weight: 300;
+    }
+
+}

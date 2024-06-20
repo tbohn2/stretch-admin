@@ -4,6 +4,7 @@ import CalendarModal from '../Components/CalendarModal';
 import NewApptsModal from '../Components/NewApptsModal';
 import ServicesModal from '../Components/ServiceModal';
 import auth from '../utils/auth';
+import '../styles/calendar.css';
 
 function CalendarDisplay({ mobile }) {
     const token = auth.getToken();

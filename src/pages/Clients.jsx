@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ClientApptModal from "../Components/ClientApptModal";
 import auth from "../utils/auth";
+import '../styles/clients.css';
 
 function Clients() {
     const token = auth.getToken()
@@ -17,7 +18,7 @@ function Clients() {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch('https://tbohn2-001-site1.ctempurl.com/api/clients', {
+            const response = await fetch('http://localhost:5062/api/clients', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -33,7 +34,7 @@ function Clients() {
 
     const payBalance = async (clientId, price) => {
         try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/adjustBalance/`, {
+            const response = await fetch(`http://localhost:5062/api/adjustBalance/`, {
                 method: 'PUT',
                 body: JSON.stringify({ ClientId: clientId, Price: price }),
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -100,7 +101,7 @@ function Clients() {
             {error && <div className="alert alert-danger fade-in">{error}</div>}
             {successMessage && <div className="alert alert-success fade-in">{successMessage}</div>}
             {displayedClients.length === 0 && !loading && <div className="alert alert-info">No clients to display</div>}
-            <input type="text" placeholder="Search" onChange={handleSearchChange} />
+            <input type="search" placeholder="Search" onChange={handleSearchChange} />
             <div className="my-2 col-12 d-flex flex-wrap justify-content-evenly">
                 {displayedClients.map((clientInfo) => {
                     const client = clientInfo.Client
@@ -155,7 +156,7 @@ function Clients() {
                     )
                 }
                 )}
-                <ClientApptModal appt={displayedAppt} token={token} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients}
+                <ClientApptModal appt={displayedAppt} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients}
                     setLoading={setLoading} setError={setError} setSuccessMessage={setSuccessMessage} />
             </div>
         </div>
