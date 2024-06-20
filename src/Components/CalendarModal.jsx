@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DropdownButton from "./DropdownButton";
 import auth from "../utils/auth";
 
-const CalendarModal = ({ services, appointments, date, month, year, refetch }) => {
+const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
 
     const adminId = localStorage.getItem('admin_id');
     const token = auth.getToken();
@@ -12,21 +12,25 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
     const statuses = ['Available', 'Requested', 'Booked', 'Completed', 'Firm'];
     const initialFormState = { Hour: 12, Minutes: '00', MeridiemAM: true, ApptTypeId: 0 };
 
+    const [appointments, setAppointments] = useState([]);
     const [newApptDetails, setNewApptDetails] = useState(initialFormState);
     const [apptDetails, setApptDetails] = useState(null);
     const [addingAppts, setAddingAppts] = useState(false);
+    const [editingAppt, setEditingAppt] = useState(false);
     const [deletingAppt, setDeletingAppt] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        setApptDetails(appointments.length === 1 ? appointments[0] : null);
-    }, [appointments]);
+        setAppointments(appts);
+        setApptDetails(appts.length === 1 ? appts[0] : null);
+    }, [appts]);
 
     const clearStates = () => {
         setNewApptDetails(initialFormState);
         setApptDetails(appointments.length === 1 ? appointments[0] : null);
         setAddingAppts(false);
+        setEditingAppt(false);
         setDeletingAppt(false);
     }
 
@@ -46,6 +50,20 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
         } else {
             setApptDetails(appt);
         }
+    }
+
+    const toggleEditing = () => {
+        if (editingAppt) {
+            setNewApptDetails(initialFormState);
+        } else {
+            setNewApptDetails({
+                Hour: new Date(apptDetails.DateTime).getHours() % 12 || 12,
+                Minutes: new Date(apptDetails.DateTime).getMinutes(),
+                MeridiemAM: new Date(apptDetails.DateTime).getHours() < 12,
+                ApptTypeId: apptDetails.ApptTypeId
+            });
+        }
+        setEditingAppt(!editingAppt);
     }
 
     const toggleDeleting = () => {
@@ -88,6 +106,44 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
         catch (error) {
             console.error(error);
             setLoading(false);
+            setError('An error occurred while making request. Please try again later.');
+        }
+    }
+
+    const editAppt = async () => {
+        setLoading(true);
+        setError('');
+        // "DateTime": "2024-04-28 14:00:00"
+        let newHour = parseInt(newApptDetails.Hour);
+        if (newApptDetails.MeridiemAM === false) {
+            newHour += 12;
+        }
+        try {
+            const response = await fetch(`http://localhost:5062/api/editAppt/`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    Id: apptDetails.Id,
+                    DateTime: `${year}-${month}-${date} ${newHour}:${newApptDetails.Minutes}:00`,
+                    ApptTypeId: newApptDetails.ApptTypeId
+                }),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                const appt = await response.json();
+                setLoading(false);
+                clearStates();
+                refetch();
+                setAppointments([appt]);
+                setApptDetails(appt);
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
+        }
+        catch (error) {
+            console.error(error);
             setError('An error occurred while making request. Please try again later.');
         }
     }
@@ -219,7 +275,6 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
                                 let display = ''
                                 if (appt.Status === 2 || appt.Status === 4) {
                                     const apptType = services.find(service => service.Id === appt.ApptTypeId)
-                                    console.log(apptType);
                                     display = apptType.Name
                                 } else {
                                     display = statuses[appt.Status]
@@ -236,7 +291,25 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
                                         {apptDetails === appt &&
                                             <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
                                                 <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
-                                                <h2 className="fs-5">Time: {time}</h2>
+                                                {editingAppt ? (
+                                                    <div className="mt-2 fs-5 col-12 d-flex flex-column align-items-center">
+                                                        <div className="d-flex col-12 justify-content-center align-items-center">
+                                                            <select name="Hour" onChange={handleInputChange}>
+                                                                {hours.map((hour, index) => <option key={index} value={hour} selected={hour === newApptDetails.Hour ? 'selected' : undefined}>{hour}</option>)}
+                                                            </select>
+                                                            <p>:</p>
+                                                            <select name="Minutes" onChange={handleInputChange}>
+                                                                {minutes.map((minute, index) => <option key={index} value={minute} selected={minute === newApptDetails.Minutes ? 'selected' : undefined}>{minute}</option>)}
+                                                            </select>
+                                                            <select name="MeridiemAM" onChange={handleInputChange}>
+                                                                <option value="AM" selected={newApptDetails.MeridiemAM}>AM</option>
+                                                                <option value="PM" selected={!newApptDetails.MeridiemAM}>PM</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <h2 className="fs-5">Time: {time}</h2>
+                                                )}
                                                 {client &&
                                                     <div className="my-2">
                                                         <h2 className="text-decoration-underline">Client Information</h2>
@@ -251,16 +324,25 @@ const CalendarModal = ({ services, appointments, date, month, year, refetch }) =
                                                         <button type="button" className="custom-btn danger-btn fs-5 col-3" onClick={denyAppt}>Deny</button>
                                                     </div>
                                                 }
-                                                {deletingAppt ?
-                                                    <div className="mt-2 fs-4 col-12 pink-border d-flex flex-column align-items-center">
-                                                        <h2>Are you sure you want to delete this appointment?</h2>
-                                                        <div className="d-flex justify-content-evenly col-12">
-                                                            <button type="button" className="custom-btn danger-btn fs-5 my-2" data-bs-dismiss="modal" onClick={deleteAppt}>Confirm Delete</button>
-                                                            <button type="button" className="custom-btn fs-5 my-2" onClick={toggleDeleting}>Cancel</button>
+                                                {deletingAppt || editingAppt ?
+                                                    deletingAppt ?
+                                                        <div className="mt-2 fs-4 col-12 pink-border d-flex flex-column align-items-center">
+                                                            <h2>Are you sure you want to delete this appointment?</h2>
+                                                            <div className="d-flex justify-content-evenly col-12">
+                                                                <button type="button" className="custom-btn danger-btn fs-5 my-2" data-bs-dismiss="modal" onClick={deleteAppt}>Confirm Delete</button>
+                                                                <button type="button" className="custom-btn fs-5 my-2" onClick={toggleDeleting}>Cancel</button>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                        : // Editing Appt
+                                                        <div className="d-flex justify-content-evenly col-12">
+                                                            <button type="button" className="custom-btn success-btn fs-5 my-2" onClick={editAppt}>Save</button>
+                                                            <button type="button" className="custom-btn fs-5 my-2" onClick={toggleEditing}>Cancel</button>
+                                                        </div>
                                                     :
-                                                    <button type="button" className="custom-btn danger-btn fs-5 mb-3" onClick={toggleDeleting}>Delete Appointment</button>
+                                                    <div className="d-flex justify-content-evenly col-12">
+                                                        <button type="button" className="custom-btn col-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
+                                                        <button type="button" className="custom-btn danger-btn col-3 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
+                                                    </div>
                                                 }
                                             </div>
                                         }

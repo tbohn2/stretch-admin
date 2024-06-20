@@ -187,7 +187,7 @@ function CalendarDisplay({ mobile }) {
                     <button id="newApptBtn" className="custom-btn fs-4" data-bs-toggle="modal" data-bs-target="#servicesModal">Edit Services</button>
                 </div>
             </div>
-            <CalendarModal services={services} appointments={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
+            <CalendarModal services={services} appts={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
             <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
             <ServicesModal services={services} getServices={getServices} />
         </div>
