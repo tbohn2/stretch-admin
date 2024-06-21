@@ -13,12 +13,14 @@ const ServicesModal = ({ services, getServices }) => {
         Duration: 0,
         Description: '',
         Private: false,
-        Location: '',
-        ImgURL: './assets/defaultService.jpg'
+        LocationName: '',
+        LocationAddress: '',
+        ImgURL: ''
     };
 
     const [addingService, setAddingService] = useState(false);
     const [editingService, setEditingService] = useState(false);
+    const [displayServiceForm, setDisplayServiceForm] = useState(false);
     const [deletingService, setDeletingService] = useState(false);
     const [serviceDetails, setServiceDetails] = useState(initialFormState);
     const [loading, setLoading] = useState(false);
@@ -38,6 +40,7 @@ const ServicesModal = ({ services, getServices }) => {
         setAddingService(false);
         setEditingService(false);
         setDeletingService(false);
+        setDisplayServiceForm(false);
         setLoading(false);
         setError('');
     }
@@ -50,21 +53,19 @@ const ServicesModal = ({ services, getServices }) => {
         }
     }
 
-    const toggleAddService = () => {
-        setServiceDetails(initialFormState);
-        setAddingService(!addingService);
-    }
-
-    const toggleEditService = () => {
-        setEditingService(!editingService);
+    const toggleServiceForm = (e) => {
+        e.preventDefault();
+        if (e.target.value === 'add') { setAddingService(true); setEditingService(false) };
+        if (e.target.value === 'edit') { setEditingService(true); setAddingService(false) };
+        if (displayServiceForm) { setServiceDetails(initialFormState) };
+        setDisplayServiceForm(!displayServiceForm);
     }
 
     const toggleDeleteService = () => {
         setDeletingService(!deletingService);
     }
 
-    const addNewApptType = async (e) => {
-        e.preventDefault();
+    const addNewApptType = async () => {
         setError('');
         setAddingService(false);
         setLoading(true);
@@ -102,7 +103,7 @@ const ServicesModal = ({ services, getServices }) => {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
-                setLoading(false);
+                clearStates();
                 localStorage.removeItem('services');
                 getServices();
             }
@@ -115,6 +116,16 @@ const ServicesModal = ({ services, getServices }) => {
             setLoading(false);
             setError('Server request failed');
             console.error(error);
+        }
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (addingService) {
+            addNewApptType();
+        }
+        if (editingService) {
+            saveEdit();
         }
     }
 
@@ -145,6 +156,55 @@ const ServicesModal = ({ services, getServices }) => {
         }
     }
 
+    const form = () => {
+        return (
+            <form className={`col-9 d-flex flex-column align-items-center ${serviceDetails && 'fade-in'}`} onSubmit={(e) => handleSubmit(e)}>
+                <div className="col-12 my-1">
+                    <label>Name:</label>
+                    <input type='text' className="col-12" name='Name' value={serviceDetails.Name} onChange={handleInputChange} required></input>
+                </div>
+                {serviceDetails.ImgURL && <img id='service-photo' className='col-6 my-1 rounded' src={serviceDetails.ImgURL} alt="servicePhoto" />}
+                <label className="">Change Image:</label>
+                <select name='ImgURL' className='col-12 text-center custom-btn my-1' value={serviceDetails.ImgURL} onChange={handleInputChange}>
+                    <option value=''>None</option>
+                    <option value='./src/assets/services1.jpg'>Yoga</option>
+                    <option value='./src/assets/services2.jpg'>Stretch 1</option>
+                    <option value='./src/assets/services3.jpg'>Stretch 2</option>
+                    <option value='./src/assets/services4.jpg'>Balls</option>
+                </select>
+                <select name='Private' className='col-12 text-center custom-btn my-1' value={serviceDetails.Private} onChange={handleInputChange}>
+                    <option value={false}>Public</option>
+                    <option value={true}>Private</option>
+                </select>
+                <div className='col-12 d-flex my-1'>
+                    <label>Price: $</label>
+                    <input className='col-2 text-center mx-1' type='number' name='Price' value={serviceDetails.Price} onChange={handleInputChange} required></input>
+                </div>
+                <div className='col-12 d-flex my-1'>
+                    <label>Duration:</label>
+                    <input className='col-2 text-center mx-1' type='number' name='Duration' value={serviceDetails.Duration} onChange={handleInputChange} required></input>
+                    <label>min</label>
+                </div>
+                <div className="col-12 my-1">
+                    <label className="col-12">Location Name (Optional):</label>
+                    <input type='text' className="col-12" name='LocationName' value={serviceDetails.LocationName} onChange={handleInputChange}></input>
+                </div>
+                <div className="col-12 my-1">
+                    <label className="col-12">Address (Optional):</label>
+                    <input type='text' className="col-12" name='LocationAddress' value={serviceDetails.LocationAddress} onChange={handleInputChange}></input>
+                </div>
+                <div className="col-12 my-1">
+                    <label className="col-12">Description:</label>
+                    <textarea type='text' className="col-12" name='Description' value={serviceDetails.Description} onChange={handleInputChange} required></textarea>
+                </div>
+                <div className='col-12 text-center my-1'>
+                    <button type="submit" className="custom-btn success-btn col-5 fs-5 m-1">Save</button>
+                    <button type="button" className="custom-btn col-5 fs-5 m-1" onClick={clearStates}>Cancel</button>
+                </div>
+            </form>
+        )
+    }
+
     return (
         <div className="modal fade" id="servicesModal" tabIndex="-1" aria-labelledby="servicesModalLabel"
             aria-hidden="true">
@@ -157,49 +217,22 @@ const ServicesModal = ({ services, getServices }) => {
                     <div id="modal-body" className="mt-2 col-12 d-flex flex-column align-items-center flex-grow-1 text-darkgray">
                         {error && <div className="alert alert-danger">{error}</div>}
                         {loading && <div className="spinner-border" role="status"></div>}
-                        {addingService ? (
-                            <form className={`col-9 d-flex flex-wrap ${serviceDetails && 'fade-in'}`} onSubmit={(e) => addNewApptType(e)}>
-                                <select name='Private' className='col-12 text-center' value={serviceDetails.Private} onChange={handleInputChange}>
-                                    <option value={false}>Public</option>
-                                    <option value={true}>Private</option>
-                                </select>
-                                <div>
-                                    <label className="col-12">Name:</label>
-                                    <input type='text' className="col-12" name='Name' value={serviceDetails.Name} onChange={handleInputChange} required></input>
-                                </div>
-                                <div className='col-12 d-flex'>
-                                    <label>Price: $</label>
-                                    <input className='col-2' type='number' name='Price' value={serviceDetails.Price} onChange={handleInputChange} required></input>
-                                </div>
-                                <div className='col-12 d-flex'>
-                                    <label>Duration:</label>
-                                    <input className='col-2' type='number' name='Duration' value={serviceDetails.Duration} onChange={handleInputChange} required></input>
-                                </div>
-                                <div>
-                                    <label className="col-12">Location:</label>
-                                    <input type='text' className="col-12" name='Location' value={serviceDetails.Location} onChange={handleInputChange}></input>
-                                </div>
-                                <div>
-                                    <label className="col-12">Description:</label>
-                                    <textarea type='text' className="col-12" name='Description' value={serviceDetails.Description} onChange={handleInputChange} required></textarea>
-                                </div>
-                                <div className='col-12 text-center'>
-                                    <button type="submit" className="custom-btn success-btn col-5 fs-5 m-1">Save</button>
-                                    <button type="button" className="custom-btn col-5 fs-5 m-1" onClick={toggleAddService}>Cancel</button>
-                                </div>
-                            </form>
+                        {displayServiceForm ? (
+                            form()
                         ) : (
                             services.map((service, index) => {
                                 return (
-                                    <div className="d-flex flex-wrap justify-content-between border my-2 px-1 fs-4 col-8">
-                                        <div className="service-button col-12 text-center " onClick={() => toggleDetails(service)}>{service.Name}</div>
-                                        {serviceDetails.Id === service.Id && !editingService &&
-                                            <div className={`col-12 d-flex flex-wrap justify-content-center ${serviceDetails && 'fade-in'}`}>
-                                                <div className="col-12">{service.Private ? 'Private' : 'Firm'}</div>
+                                    <div className="d-flex flex-wrap justify-content-between border-darkgray rounded my-2 px-1 fs-4 col-8">
+                                        <div className="service-button col-12 text-center" onClick={() => toggleDetails(service)}>{service.Name}</div>
+                                        {serviceDetails.Id === service.Id && !displayServiceForm &&
+                                            <div className={`my-1 col-12 d-flex flex-wrap justify-content-center ${serviceDetails && 'fade-in'}`}>
+                                                <div className="col-12 text-center bg-purple text-white">{service.Private ? 'Private' : 'Public'}</div>
                                                 <div className="col-12">Price: ${service.Price}</div>
                                                 <div className="col-12">Duration: {service.Duration} min</div>
-                                                <div className="col-12">Location:</div>
-                                                <div className="col-12">{service.Location ? service.Location : 'No location specified'}</div>
+                                                {service.LocationName && <div className="col-12">Location:</div>}
+                                                {service.LocationName && <div className="col-12">{service.LocationName}</div>}
+                                                {service.LocationAddress && <div className="col-12">Address:</div>}
+                                                {service.LocationAddress && <div className="col-12">{service.LocationAddress}</div>}
                                                 <div className="col-12">Description:</div>
                                                 <div className="col-12">{service.Description}</div>
                                                 {deletingService ? (
@@ -208,39 +241,13 @@ const ServicesModal = ({ services, getServices }) => {
                                                         <button type="button" className="custom-btn danger-btn col-5 fs-5 m-1" onClick={deleteService}>Yes</button>
                                                         <button type="button" className="custom-btn col-5 fs-5 m-1" onClick={toggleDeleteService}>Cancel</button>
                                                     </div>
-
                                                 ) : (
                                                     <div className='col-12 text-center'>
-                                                        <button type="button" className="custom-btn col-5 fs-5 m-1" onClick={toggleEditService}>Edit</button>
+                                                        <button type="button" className="custom-btn col-5 fs-5 m-1" value='edit' onClick={toggleServiceForm}>Edit</button>
                                                         <button type="button" className="custom-btn danger-btn col-5 fs-5 m-1" onClick={toggleDeleteService}>Delete</button>
                                                     </div>
                                                 )
                                                 }
-                                            </div>
-                                        }
-                                        {serviceDetails.Id === service.Id && editingService &&
-                                            <div className={`col-12 d-flex flex-wrap ${serviceDetails && 'fade-in'}`}>
-                                                <div className="col-12">{service.Private ? 'Private' : 'Firm'}</div>
-                                                <div className='col-12 d-flex'>
-                                                    <label>Price: $</label>
-                                                    <input className='col-2' type='number' name='Price' value={serviceDetails.Price} onChange={handleInputChange}></input>
-                                                </div>
-                                                <div className='col-12 d-flex'>
-                                                    <label>Duration:</label>
-                                                    <input className='col-2' type='number' name='Duration' value={serviceDetails.Duration} onChange={handleInputChange}></input>
-                                                </div>
-                                                <div>
-                                                    <label className="col-12">Location:</label>
-                                                    <input type='text' className="col-12" name='Location' value={serviceDetails.Location} onChange={handleInputChange}></input>
-                                                </div>
-                                                <div>
-                                                    <label className="col-12">Description:</label>
-                                                    <textarea type='text' className="col-12" name='Description' value={serviceDetails.Description} onChange={handleInputChange}></textarea>
-                                                </div>
-                                                <div className='col-12 text-center'>
-                                                    <button type="button" className="custom-btn success-btn col-5 fs-5 m-1" onClick={saveEdit}>Save</button>
-                                                    <button type="button" className="custom-btn col-5 fs-5 m-1" onClick={toggleEditService}>Cancel</button>
-                                                </div>
                                             </div>
                                         }
                                     </div>
@@ -249,7 +256,7 @@ const ServicesModal = ({ services, getServices }) => {
                         )}
                     </div>
                     <div id="modal-footer" className="d-flex align-self-end justify-content-end mt-2">
-                        <button type="button" className="custom-btn fs-5 m-1" onClick={toggleAddService}>Add Service</button>
+                        <button type="button" className="custom-btn fs-5 m-1" value='add' onClick={toggleServiceForm}>Add Service</button>
                         <button type="button" className="custom-btn fs-5 m-1" data-bs-dismiss="modal" onClick={clearStates}>Close</button>
                     </div>
                 </div>

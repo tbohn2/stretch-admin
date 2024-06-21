@@ -17,15 +17,20 @@
     background-color: var(--gray);
 }
 
+.bg-purple {
+    background-color: var(--purple);
+}
+
+.text-white {
+    color: var(--white);
+}
+
 .text-darkgray {
     color: var(--darkgray);
 }
 
-.pink-border {
-    border: 2px solid;
-    border-image: linear-gradient(to left, var(--white), var(--pink));
-    border-image-slice: 1;
-    border-image-repeat: stretch;
+.border-darkgray {
+    border: 1px solid var(--darkgray);
 }
 
 .blueBG {
@@ -116,15 +121,36 @@ textarea {
 }
 
 input[type="text"] {
-    border: 1px solid var(--white);
-    border-image: linear-gradient(to left, var(--white), var(--pink));
-    border-image-slice: 1;
-    border-image-repeat: stretch;
+    border: 1px solid var(--purple);
+    border-radius: 7px;
+    padding-left: 5px;
 }
 
 input[type="text"]:focus {
-    border: 1px solid var(--pink);
-    outline: 1px solid var(--pink);
+    border: 1px solid var(--purple);
+    outline: 1px solid var(--purple);
+}
+
+input[type="number"] {
+    border: 1px solid var(--purple);
+    border-radius: 7px;
+    padding-left: 5px;
+}
+
+input[type="number"]:focus {
+    border: 1px solid var(--purple);
+    outline: 1px solid var(--purple);
+}
+
+textarea {
+    border: 1px solid var(--purple);
+    border-radius: 7px;
+    padding-left: 5px;
+}
+
+textarea:focus {
+    border: 1px solid var(--purple);
+    outline: 1px solid var(--purple);
 }
 
 @keyframes fade-in {
