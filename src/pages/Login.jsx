@@ -40,18 +40,14 @@ const Login = ({ setLoggedIn }) => {
     }
 
     return (
-        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center col-10 col-md-6 text-light fs-3">
+        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center col-10 col-md-6 text-darkgray p-3 fs-4 bg-white rounded">
             <h1>Login</h1>
             {error && <div className="fs-4 alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit} className="col-12 d-flex flex-column align-items-center">
-                <div className="mb-3 col-12">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input type="username" className="form-control" id="username" aria-describedby="usernameHelp" onChange={handleUsernameChange} required />
-                </div>
-                <div className="mb-3 col-12">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" id="password" onChange={handlePasswordChange} required />
-                </div>
+                <label htmlFor="username" className="form-label col-12">Username</label>
+                <input type="text" id="username" className="input col-12" aria-describedby="usernameHelp" onChange={handleUsernameChange} required />
+                <label htmlFor="password" className="form-label col-12">Password</label>
+                <input type="password" id="password" className="input col-12 mb-3" onChange={handlePasswordChange} required />
                 {loading ?
                     <div className="spinner-border" role="status"></div>
                     :
