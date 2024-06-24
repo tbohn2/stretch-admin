@@ -78,20 +78,18 @@
 
 .appt-card {
     color: var(--darkgray);
+    border: 1px solid var(--darkgray);
+    border-radius: 7px;
+}
+
+.appt-card-header {
     cursor: pointer;
+
 }
 
 .appt-card:hover {
-    box-shadow: 0 0 10px var(--pink);
+    box-shadow: 0 0 10px var(--purple);
     transition: all 0.3s ease;
-}
-
-.appt-details {
-    border-width: 0px 2px 2px 2px;
-    border-style: solid;
-    border-image: linear-gradient(to left, var(--white), var(--pink));
-    border-image-slice: 1;
-    border-image-repeat: stretch;
 }
 
 .service-button {

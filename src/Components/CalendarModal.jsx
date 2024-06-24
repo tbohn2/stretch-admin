@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import DropdownButton from "./DropdownButton";
 import auth from "../utils/auth";
 
 const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
 
+    const privateServices = services.filter(service => service.Private === true);
+    const publicServices = services.filter(service => service.Private === false);
     const adminId = localStorage.getItem('admin_id');
     const token = auth.getToken();
     const dateDisplay = new Date(year, month - 1, date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const minutes = ['00', '15', '30', '45'];
-    const statuses = ['Available', 'Requested', 'Booked', 'Completed', 'Firm'];
-    const initialFormState = { Hour: 12, Minutes: '00', MeridiemAM: true, ApptTypeId: 0 };
+    const statuses = ['Available', 'Requested', 'Booked', 'Completed', 'Public'];
+    const initialFormState = { Hour: 12, Minutes: '00', MeridiemAM: true, ApptTypeId: null, Status: 0 };
 
     const [appointments, setAppointments] = useState([]);
     const [newApptDetails, setNewApptDetails] = useState(initialFormState);
@@ -32,12 +33,16 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
         setAddingAppts(false);
         setEditingAppt(false);
         setDeletingAppt(false);
+        setLoading(false);
+        setError('');
     }
 
     const handleInputChange = (e) => {
         let { name, value } = e.target;
-        console.log(name, value);
         if (name === 'MeridiemAM') { value === 'AM' ? value = true : value = false }
+        else if (name === 'Private') { value === 'true' ? value = true : value = false }
+        else { value = parseInt(value) }
+
         setNewApptDetails({
             ...newApptDetails,
             [name]: value
@@ -60,7 +65,8 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
                 Hour: new Date(apptDetails.DateTime).getHours() % 12 || 12,
                 Minutes: new Date(apptDetails.DateTime).getMinutes(),
                 MeridiemAM: new Date(apptDetails.DateTime).getHours() < 12,
-                ApptTypeId: apptDetails.ApptTypeId
+                ApptTypeId: apptDetails.ApptTypeId,
+                Status: apptDetails.Status
             });
         }
         setEditingAppt(!editingAppt);
@@ -77,12 +83,13 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
         let newHour = parseInt(newApptDetails.Hour);
         if (newApptDetails.MeridiemAM === false) {
             newHour += 12;
+            newHour = newHour === 24 ? '00' : newHour;
         }
 
         const newAppt = {
             AdminId: adminId,
             DateTime: `${year}-${month}-${date} ${newHour}:${newApptDetails.Minutes}:00`,
-            // Server uses ApptType to determine status Available or Firm
+            // Server uses ApptType to determine status Available or Public
             ApptTypeId: newApptDetails.ApptTypeId
         }
 
@@ -114,7 +121,7 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
         setLoading(true);
         setError('');
         // "DateTime": "2024-04-28 14:00:00"
-        let newHour = parseInt(newApptDetails.Hour);
+        let newHour = newApptDetails.Hour;
         if (newApptDetails.MeridiemAM === false) {
             newHour += 12;
         }
@@ -229,6 +236,43 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
         }
     }
 
+    const timeSelector = () => {
+        return (
+            <div className="d-flex flex-column col-12 justify-content-center align-items-center my-2">
+                <div className="d-flex col-12 justify-content-center align-items-center">
+                    <select name="Hour" className="custom-btn mx-1" onChange={handleInputChange}>
+                        {hours.map((hour, index) => <option key={index} value={hour} selected={hour === newApptDetails.Hour ? 'selected' : undefined}>{hour}</option>)}
+                    </select>
+                    <p className="d-flex align-items-center my-0">:</p>
+                    <select name="Minutes" className="custom-btn mx-1" onChange={handleInputChange}>
+                        {minutes.map((minute, index) => <option key={index} value={minute} selected={minute === newApptDetails.Minutes ? 'selected' : undefined}>{minute}</option>)}
+                    </select>
+                    <select name="MeridiemAM" className="custom-btn" onChange={handleInputChange}>
+                        <option value="AM" selected={newApptDetails.MeridiemAM}>AM</option>
+                        <option value="PM" selected={!newApptDetails.MeridiemAM}>PM</option>
+                    </select>
+                </div>
+                {addingAppts &&
+                    <select name="Status" className="custom-btn mt-2" onChange={handleInputChange}>
+                        <option value='4' selected={newApptDetails.Status === 4}>Public</option>
+                        <option value='0' selected={newApptDetails.Status !== 4}>Private</option>
+                    </select>
+                }
+                {newApptDetails.Status !== 0 ? // Service not Available
+                    newApptDetails.Status !== 4 ? // Service not Public (has Status 1, 2, or 3)
+                        <select name="ApptTypeId" className="custom-btn mt-2" onChange={handleInputChange}>
+                            {privateServices.map((service, index) => <option key={index} value={service.Id} selected={service.Id === newApptDetails.ApptTypeId}>{service.Name}</option>)}
+                        </select>
+                        : // Service is Public
+                        <select name="ApptTypeId" className="custom-btn mt-2" onChange={handleInputChange}>
+                            {publicServices.map((service, index) => <option key={index} value={service.Id} selected={service.Id === newApptDetails.ApptTypeId}>{service.Name}</option>)}
+                        </select>
+                    : null
+                }
+            </div>
+        )
+    }
+
     return (
         <div className="modal fade" id="apptsModal" tabIndex="-1" aria-labelledby="apptsModalLabel"
             aria-hidden="true">
@@ -243,29 +287,12 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
                         {loading && <div className="spinner-border" role="status"></div>}
                         {error && <div className="alert alert-danger">{error}</div>}
                         {addingAppts ?
-                            <div className="mt-2 fs-4 col-11 pink-border d-flex flex-column align-items-center">
-                                <h2>Add Available Time</h2>
-                                <div className="d-flex col-12 justify-content-center align-items-center">
-                                    <select name="Hour" onChange={handleInputChange}>
-                                        {hours.map((hour, index) => <option key={index} value={hour} selected={hour === 12 ? 'selected' : undefined}>{hour}</option>)}
-                                    </select>
-                                    <p>:</p>
-                                    <select name="Minutes" onChange={handleInputChange}>
-                                        {minutes.map((minute, index) => <option key={index} value={minute} selected={minute === '00' ? 'selected' : undefined}>{minute}</option>)}
-                                    </select>
-                                    <select name="MeridiemAM" onChange={handleInputChange}>
-                                        <option value="AM" selected>AM</option>
-                                        <option value="PM">PM</option>
-                                    </select>
-                                </div>
-                                <div className="d-flex col-12 justify-content-center align-items-center">
-                                    <select name="ApptTypeId" onChange={handleInputChange}>
-                                        {services.map((service, index) => <option key={index} value={service.Id}>{service.Name}</option>)}
-                                    </select>
-                                </div>
-                                <div className="d-flex justify-content-evenly col-12">
-                                    <button type="button" className="custom-btn success-btn fs-5 my-2" onClick={addAppt}>Confirm Time</button>
-                                    <button type="button" className="custom-btn danger-btn fs-5 my-2" onClick={clearStates}>Cancel</button>
+                            <div className="mt-2 fs-4 col-11 d-flex flex-wrap align-items-center">
+                                <h3 className="col-12 text-center">Add Available Time</h3>
+                                {timeSelector()}
+                                <div className="d-flex justify-content-evenly col-12 my-2">
+                                    <button type="button" className="custom-btn success-btn fs-5" onClick={addAppt}>Confirm Time</button>
+                                    <button type="button" className="custom-btn danger-btn fs-5" onClick={clearStates}>Cancel</button>
                                 </div>
                             </div>
                             :
@@ -283,70 +310,61 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
 
                                 return (
                                     <div key={appt.Id} id={appt.Id} className="d-flex flex-column align-items-center col-11">
-                                        <div className="appt-card col-12 pink-border px-1 mt-3 d-flex align-items-center" onClick={() => toggleDetails(appt)}>
-                                            <h2 className="fs-5 my-1 col-3">{time}</h2>
-                                            <h2 className="fs-5 my-1 col-6 text-center">{display}</h2>
-                                            <h2 className="my-1 col-3"></h2>
-                                        </div>
-                                        {apptDetails === appt &&
-                                            <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
-                                                <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
-                                                {editingAppt ? (
-                                                    <div className="mt-2 fs-5 col-12 d-flex flex-column align-items-center">
-                                                        <div className="d-flex col-12 justify-content-center align-items-center">
-                                                            <select name="Hour" onChange={handleInputChange}>
-                                                                {hours.map((hour, index) => <option key={index} value={hour} selected={hour === newApptDetails.Hour ? 'selected' : undefined}>{hour}</option>)}
-                                                            </select>
-                                                            <p>:</p>
-                                                            <select name="Minutes" onChange={handleInputChange}>
-                                                                {minutes.map((minute, index) => <option key={index} value={minute} selected={minute === newApptDetails.Minutes ? 'selected' : undefined}>{minute}</option>)}
-                                                            </select>
-                                                            <select name="MeridiemAM" onChange={handleInputChange}>
-                                                                <option value="AM" selected={newApptDetails.MeridiemAM}>AM</option>
-                                                                <option value="PM" selected={!newApptDetails.MeridiemAM}>PM</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <h2 className="fs-5">Time: {time}</h2>
-                                                )}
-                                                {client &&
-                                                    <div className="my-2">
-                                                        <h2 className="text-decoration-underline">Client Information</h2>
-                                                        <p className="fs-5 m-0">{client.Name}</p>
-                                                        <p className="fs-5 m-0">{client.Phone.includes('-') ? client.Phone : `${client.Phone.slice(0, 3)}-${client.Phone.slice(3, 6)}-${client.Phone.slice(6)}`}</p>
-                                                        <p className="fs-5 m-0">{client.Email}</p>
-                                                    </div>
-                                                }
-                                                {appt.Status === 1 &&
-                                                    <div className="d-flex justify-content-evenly my-3">
-                                                        <button type="button" className="custom-btn success-btn fs-5 col-3" onClick={approveAppt}>Approve</button>
-                                                        <button type="button" className="custom-btn danger-btn fs-5 col-3" onClick={denyAppt}>Deny</button>
-                                                    </div>
-                                                }
-                                                {deletingAppt || editingAppt ?
-                                                    deletingAppt ?
-                                                        <div className="mt-2 fs-4 col-12 pink-border d-flex flex-column align-items-center">
-                                                            <h2>Are you sure you want to delete this appointment?</h2>
-                                                            <div className="d-flex justify-content-evenly col-12">
-                                                                <button type="button" className="custom-btn danger-btn fs-5 my-2" data-bs-dismiss="modal" onClick={deleteAppt}>Confirm Delete</button>
-                                                                <button type="button" className="custom-btn fs-5 my-2" onClick={toggleDeleting}>Cancel</button>
-                                                            </div>
-                                                        </div>
-                                                        : // Editing Appt
-                                                        <div className="d-flex justify-content-evenly col-12">
-                                                            <button type="button" className="custom-btn success-btn fs-5 my-2" onClick={editAppt}>Save</button>
-                                                            <button type="button" className="custom-btn fs-5 my-2" onClick={toggleEditing}>Cancel</button>
-                                                        </div>
-                                                    :
-                                                    <div className="d-flex justify-content-evenly col-12">
-                                                        <button type="button" className="custom-btn col-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
-                                                        <button type="button" className="custom-btn danger-btn col-3 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
-                                                    </div>
-                                                }
+                                        <div className="appt-card col-12 px-1 mt-3 d-flex flex-wrap align-items-center">
+                                            <div className="appt-card-header col-12 d-flex px-1" onClick={() => toggleDetails(appt)}>
+                                                <h2 className="fs-5 my-1 col-3">{time}</h2>
+                                                <h2 className="fs-5 my-1 col-6 text-center">{display}</h2>
+                                                <h2 className="my-1 col-3"></h2>
                                             </div>
-                                        }
+                                            {apptDetails === appt &&
+                                                <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
+                                                    <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
+                                                    {editingAppt ? (
+                                                        <div className="mt-2 fs-5 col-12 d-flex flex-column align-items-center">
+                                                            {timeSelector()}
+                                                        </div>
+                                                    ) : (
+                                                        <h2 className="fs-5">Time: {time}</h2>
+                                                    )}
+                                                    {client &&
+                                                        <div className="my-2">
+                                                            <h2 className="text-decoration-underline">Client Information</h2>
+                                                            <p className="fs-5 m-0">{client.Name}</p>
+                                                            <p className="fs-5 m-0">{client.Phone.includes('-') ? client.Phone : `${client.Phone.slice(0, 3)}-${client.Phone.slice(3, 6)}-${client.Phone.slice(6)}`}</p>
+                                                            <p className="fs-5 m-0">{client.Email}</p>
+                                                        </div>
+                                                    }
+                                                    {appt.Status === 1 &&
+                                                        <div className="d-flex justify-content-evenly my-3">
+                                                            <button type="button" className="custom-btn success-btn fs-5 col-3" onClick={approveAppt}>Approve</button>
+                                                            <button type="button" className="custom-btn danger-btn fs-5 col-3" onClick={denyAppt}>Deny</button>
+                                                        </div>
+                                                    }
+                                                    {deletingAppt || editingAppt ?
+                                                        deletingAppt ?
+                                                            <div className="mt-2 fs-4 col-12 pink-border d-flex flex-column align-items-center">
+                                                                <h3>Are you sure you want to delete this appointment?</h3>
+                                                                <div className="d-flex justify-content-evenly col-12">
+                                                                    <button type="button" className="custom-btn danger-btn fs-5 my-2" data-bs-dismiss="modal" onClick={deleteAppt}>Confirm Delete</button>
+                                                                    <button type="button" className="custom-btn fs-5 my-2" onClick={toggleDeleting}>Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                            : // Editing Appt
+                                                            <div className="d-flex justify-content-evenly col-12">
+                                                                <button type="button" className="custom-btn success-btn fs-5 my-2" onClick={editAppt}>Save</button>
+                                                                <button type="button" className="custom-btn fs-5 my-2" onClick={toggleEditing}>Cancel</button>
+                                                            </div>
+                                                        :
+                                                        <div className="d-flex justify-content-evenly col-12">
+                                                            <button type="button" className="custom-btn col-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
+                                                            <button type="button" className="custom-btn danger-btn col-3 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
+
                                 )
                             })}
                     </div>
