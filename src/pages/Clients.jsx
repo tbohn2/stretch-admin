@@ -1,18 +1,40 @@
 import React, { useEffect, useState } from "react";
 import ClientApptModal from "../Components/ClientApptModal";
+import CalendarModal from "../Components/CalendarModal";
 import auth from "../utils/auth";
 import '../styles/clients.css';
 
 function Clients() {
     const token = auth.getToken()
-    const [clients, setClients] = useState([]);
-    const [displayedClients, setDisplayedClients] = useState([]);
+
+    const [services, setServices] = useState([]);
+    const [clients, setClients] = useState([]); // All clients
+    const [displayedClients, setDisplayedClients] = useState([]); // Changes with search input
     const [displayedAppt, setDisplayedAppt] = useState({});
+    const [displayDate, setDisplayDate] = useState(0);
+    const [displayMonth, setDisplayMonth] = useState(0);
+    const [displayYear, setDisplayYear] = useState(0);
+    const [displayedService, setDisplayedService] = useState({});
     const [displayedPastAppts, setDisplayedPastAppts] = useState([]);
     const [displayClient, setDisplayClient] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    const getServices = async () => {
+        const services = await auth.getServices();
+        if (typeof services === 'string') { setError(services); return; }
+        setServices(services);
+    }
+
+    useEffect(() => {
+        getServices();
+    }, []);
+
+    const getService = async (appt) => {
+        const service = services.find(service => service.Id === appt.ApptTypeId);
+        setDisplayedService(service);
+    }
 
     const fetchClients = async () => {
         setLoading(true);
@@ -95,13 +117,22 @@ function Clients() {
         setDisplayedClients(filteredClients);
     }
 
+    const setModalStates = (appt) => {
+        setDisplayedAppt(appt);
+        getService(appt);
+        const date = new Date(appt.DateTime);
+        setDisplayDate(date.getDate());
+        setDisplayMonth(date.getMonth() + 1);
+        setDisplayYear(date.getFullYear());
+    }
+
     return (
         <div id='clients' className="pb-2 text-light d-flex flex-column align-items-center">
             {loading && <div className="spinner-border fade-in" role="status"></div>}
             {error && <div className="alert alert-danger fade-in">{error}</div>}
             {successMessage && <div className="alert alert-success fade-in">{successMessage}</div>}
             {displayedClients.length === 0 && !loading && <div className="alert alert-info">No clients to display</div>}
-            <input type="search" placeholder="Search" onChange={handleSearchChange} />
+            <input type="search" className="input fs-5" placeholder="Search" onChange={handleSearchChange} />
             <div className="my-2 col-12 d-flex flex-wrap justify-content-evenly">
                 {displayedClients.map((clientInfo) => {
                     const client = clientInfo.Client
@@ -110,7 +141,7 @@ function Clients() {
                     const pastAppts = sortAppts(clientAppts.filter((appt) => appt.Status === 3))
                     const futureAppts = sortAppts(clientAppts.filter((appt) => appt.Status !== 3))
                     return (
-                        <div key={client.Id} className="client-card fade-in my-2 col-10 col-md-5 pink-border d-flex flex-column align-items-center">
+                        <div key={client.Id} className="bg-white text-darkgray rounded fade-in p-1 my-2 col-10 col-md-5 d-flex flex-column align-items-center">
                             <div className="col-12 d-flex flex-column align-items-center border-bottom border-light">
                                 <h3 className="m-0">{client.Name}</h3>
                                 <p className="m-0">{client.Email}</p>
@@ -122,7 +153,7 @@ function Clients() {
                                     const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                     return (
                                         <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-evenly align-items-center col-10 col-lg-8 my-2"
-                                            onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
+                                            onClick={() => { setModalStates(appt) }} data-bs-toggle="modal" data-bs-target="#apptsModal">
                                             <p className="fs-5 m-0 text-center">{date}</p>
                                             <p className="fs-5 m-0 text-center">{time}</p>
                                         </div>
@@ -143,7 +174,7 @@ function Clients() {
                                         const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                         return (
                                             <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-between align-items-center col-10 col-lg-8 px-1 m-2"
-                                                onClick={() => setDisplayedAppt(appt)} data-bs-toggle="modal" data-bs-target="#clientApptModal">
+                                                onClick={() => setModalStates(appt)} data-bs-toggle='modal' data-bs-target='#apptsModal'>
                                                 <p className="fs-5 my-1 text-center">{date}</p>
                                                 <p className="fs-5 my-1 text-center">{time}</p>
                                                 <p className="fs-5 my-1 text-center">${appt.Price}</p>
@@ -156,8 +187,7 @@ function Clients() {
                     )
                 }
                 )}
-                <ClientApptModal appt={displayedAppt} clearAppt={() => setDisplayedAppt({})} refetch={fetchClients}
-                    setLoading={setLoading} setError={setError} setSuccessMessage={setSuccessMessage} />
+                <CalendarModal services={services} displayService={displayedService} setDisplayService={setDisplayedService} appts={[displayedAppt]} date={displayDate} month={displayMonth} year={displayYear} refetch={fetchClients} token={token} />
             </div>
         </div>
     );

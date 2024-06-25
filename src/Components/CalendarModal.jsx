@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import auth from "../utils/auth";
 
-const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
+const CalendarModal = ({ services, displayService, setDisplayService, appts, date, month, year, refetch }) => {
 
     const privateServices = services.filter(service => service.Private === true);
     const publicServices = services.filter(service => service.Private === false);
@@ -30,6 +30,7 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
     const clearStates = () => {
         setNewApptDetails(initialFormState);
         setApptDetails(appointments.length === 1 ? appointments[0] : null);
+        setDisplayService(null);
         setAddingAppts(false);
         setEditingAppt(false);
         setDeletingAppt(false);
@@ -209,6 +210,31 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
         }
     }
 
+    const completeAppt = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const response = await fetch(`http://localhost:5062/api/completeAppt/`, {
+                method: 'PUT',
+                body: JSON.stringify({ Id: apptDetails.Id, ApptType: { Price: displayService.Price }, ClientId: apptDetails.ClientId }),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                setLoading(false);
+            }
+            if (!response.ok) {
+                setLoading(false);
+                setError('Failed to complete appointment')
+            }
+            refetch();
+        }
+        catch (error) {
+            console.error(error);
+            setError('An error occurred while making request. Please try again later.');
+        }
+    }
+
+
     const deleteAppt = async () => {
         setLoading(true);
         setDeletingAppt(false);
@@ -319,6 +345,12 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
                                             {apptDetails === appt &&
                                                 <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
                                                     <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
+                                                    {displayService &&
+                                                        <div>
+                                                            <h2 className="fs-5">{displayService.Name}</h2>
+                                                            <h2 className="fs-5">Price: ${displayService.Price}</h2>
+                                                        </div>
+                                                    }
                                                     {editingAppt ? (
                                                         <div className="mt-2 fs-5 col-12 d-flex flex-column align-items-center">
                                                             {timeSelector()}
@@ -356,8 +388,9 @@ const CalendarModal = ({ services, appts, date, month, year, refetch }) => {
                                                             </div>
                                                         :
                                                         <div className="d-flex justify-content-evenly col-12">
+                                                            <button type="button" className="custom-btn success-btn col-4 fs-5 mb-3" onClick={completeAppt}>Set Complete</button>
                                                             <button type="button" className="custom-btn col-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
-                                                            <button type="button" className="custom-btn danger-btn col-3 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
+                                                            <button type="button" className="custom-btn danger-btn col-4 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
                                                         </div>
                                                     }
                                                 </div>
