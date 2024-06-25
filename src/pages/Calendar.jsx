@@ -15,37 +15,21 @@ function CalendarDisplay({ mobile }) {
     const currentMonth = new Date().getMonth() + 1;
 
     const [services, setServices] = useState([]);
-    const [displayDate, setDisplayDate] = useState(currentDate);
-    const [displayMonth, setDisplayMonth] = useState(currentMonth);
-    const [displayYear, setDisplayYear] = useState(currentYear);
-    const [displayDates, setdisplayDates] = useState(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
-    const [appointments, setAppointments] = useState([]);
+    const [displayService, setDisplayService] = useState({});
+    const [displayDate, setDisplayDate] = useState('');
+    const [calendarMonth, setCalendarMonth] = useState(currentMonth);
+    const [calendarYear, setCalendarYear] = useState(currentYear);
+    const [calendarDates, setCalendarDates] = useState(new calendar.Calendar(6).monthdayscalendar(calendarYear, calendarMonth));
+    const [appointments, setAppointments] = useState({});
     const [dayAppts, setDayAppts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const getServices = async () => {
-        try {
-            const cachedServices = localStorage.getItem('services');
-            if (cachedServices) {
-                setServices(JSON.parse(cachedServices));
-                return;
-            }
-
-            const response = await fetch(`http://localhost:5062/api/allServices`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
-            if (response.ok) {
-                const services = await response.json();
-                localStorage.setItem('services', JSON.stringify(services));
-                setServices(services);
-            } else {
-                setError('Server request failed to retrieve services. Please try again later.');
-                console.error('Server request failed');
-            }
-        } catch (error) {
-            setError('Server request failed to retrieve services. Please try again later.');
-            console.error(error);
-        }
-    };
+        const services = await auth.getServices();
+        if (typeof services === 'string') { setError(services); return; }
+        setServices(services);
+    }
 
     useEffect(() => {
         getServices();
@@ -55,10 +39,21 @@ function CalendarDisplay({ mobile }) {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`http://localhost:5062/api/allAppts/${displayMonth}/${displayYear}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+            const response = await fetch(`http://localhost:5062/api/allAppts/${calendarMonth}/${calendarYear}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
             const data = await response.json();
             setLoading(false);
-            if (response.ok) { setAppointments(data) }
+            if (response.ok) {
+                let apptsByDate = {};
+                data.forEach(appt => {
+                    const date = new Date(appt.DateTime).getDate();
+
+                    if (!apptsByDate[date]) {
+                        apptsByDate[date] = [];
+                    }
+                    apptsByDate[date].push(appt);
+                });
+                setAppointments(apptsByDate);
+            }
             if (!response.ok) { setError(data) }
         } catch (error) {
             console.error(error);
@@ -69,31 +64,31 @@ function CalendarDisplay({ mobile }) {
 
     useEffect(() => {
         getAppointments();
-        setdisplayDates(new calendar.Calendar(6).monthdayscalendar(displayYear, displayMonth));
-    }, [displayMonth, displayYear]);
+        setCalendarDates(new calendar.Calendar(6).monthdayscalendar(calendarYear, calendarMonth));
+    }, [calendarMonth, calendarYear]);
 
 
     const handlePrevClick = () => {
-        if (displayMonth === 1) {
-            const prevYear = displayYear - 1;
-            setDisplayMonth(12);
-            setDisplayYear(prevYear);
+        if (calendarMonth === 1) {
+            const prevYear = calendarYear - 1;
+            setCalendarMonth(12);
+            setCalendarYear(prevYear);
         }
         else {
-            const prevMonth = displayMonth - 1;
-            setDisplayMonth(prevMonth);
+            const prevMonth = calendarMonth - 1;
+            setCalendarMonth(prevMonth);
         }
     }
 
     const handleNextClick = () => {
-        if (displayMonth === 12) {
-            const nextYear = displayYear + 1;
-            setDisplayMonth(1);
-            setDisplayYear(nextYear);
+        if (calendarMonth === 12) {
+            const nextYear = calendarYear + 1;
+            setCalendarMonth(1);
+            setCalendarYear(nextYear);
         }
         else {
-            const nextMonth = displayMonth + 1;
-            setDisplayMonth(nextMonth);
+            const nextMonth = calendarMonth + 1;
+            setCalendarMonth(nextMonth);
         }
     }
 
@@ -104,7 +99,7 @@ function CalendarDisplay({ mobile }) {
                 <div id="calendar-header" className="col-12 bg-white d-flex align-items-center">
                     <button id="prev" className="monthNavBtn custom-btn" onClick={handlePrevClick}>&#8592;</button>
                     <button id="next" className="monthNavBtn custom-btn" onClick={handleNextClick}>&#8594;</button>
-                    <h1 id="month" className="fw-light">{months[displayMonth - 1]} {displayYear}</h1>
+                    <h1 id="month" className="fw-light">{months[calendarMonth - 1]} {calendarYear}</h1>
                     {loading && <div className="spinner-border" role="status"></div>}
                     {error && <div className="alert alert-danger mx-2 my-0 p-2">{error}</div>}
                 </div>
@@ -119,12 +114,12 @@ function CalendarDisplay({ mobile }) {
                         <div>Sat</div>
                     </div>
                     <div id="calendar-dates" className="d-flex flex-column col-12">
-                        {displayDates.map((week, index) => {
+                        {calendarDates.map((week, index) => {
                             return (
                                 <div className="d-flex col-12 fade-in">
                                     {week.map((date, index) => {
-                                        const apptsForDay = appointments.filter(appt => new Date(appt.DateTime).getDate() === date)
-                                            .sort((a, b) => new Date(a.DateTime) - new Date(b.DateTime));
+                                        // Sort on server side
+                                        const apptsForDay = appointments[date] || [];
                                         let numberDisplay
 
                                         if (date === 0) { numberDisplay = '' }
@@ -157,9 +152,8 @@ function CalendarDisplay({ mobile }) {
                                                         :
                                                         apptsForDay.map((appt, index) => {
                                                             let display = ''
+                                                            const apptType = services.find(service => service.Id === appt.ApptTypeId)
                                                             if (appt.Status === 2 || appt.Status === 4) {
-                                                                const apptType = services.find(service => service.Id === appt.ApptTypeId)
-                                                                console.log(apptType);
                                                                 display = apptType.Name
                                                             } else {
                                                                 display = statuses[appt.Status]
@@ -168,7 +162,7 @@ function CalendarDisplay({ mobile }) {
                                                             const apptTime = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
                                                             return (
-                                                                <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts([appt]); setDisplayDate(date) }}>
+                                                                <div id={appt.Id} data-bs-toggle='modal' data-bs-target='#apptsModal' className='appt-time' onClick={() => { setDayAppts([appt]); setDisplayDate(date); setDisplayService(apptType) }}>
                                                                     {apptTime} {display}
                                                                 </div>
                                                             )
@@ -188,7 +182,7 @@ function CalendarDisplay({ mobile }) {
                     <button id="newApptBtn" className="custom-btn fs-4" data-bs-toggle="modal" data-bs-target="#servicesModal">Edit Services</button>
                 </div>
             </div>
-            <CalendarModal services={services} appts={dayAppts} date={displayDate} month={displayMonth} year={displayYear} refetch={getAppointments} token={token} />
+            <CalendarModal services={services} displayService={displayService} setDisplayService={setDisplayService} appts={dayAppts} date={displayDate} month={calendarMonth} year={calendarYear} refetch={getAppointments} token={token} />
             <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
             <ServicesModal services={services} getServices={getServices} />
         </div>
