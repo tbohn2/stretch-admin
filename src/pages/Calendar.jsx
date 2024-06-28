@@ -183,7 +183,7 @@ function CalendarDisplay({ mobile }) {
                 </div>
             </div>
             <CalendarModal services={services} displayService={displayService} setDisplayService={setDisplayService} appts={dayAppts} date={displayDate} month={calendarMonth} year={calendarYear} refetch={getAppointments} token={token} />
-            <NewApptsModal refetch={getAppointments} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
+            <NewApptsModal refetch={getAppointments} services={services} months={months} currentDate={currentDate} currentMonth={currentMonth} currentYear={currentYear} setLoading={setLoading} setError={setError} token={token} />
             <ServicesModal services={services} getServices={getServices} />
         </div>
     );

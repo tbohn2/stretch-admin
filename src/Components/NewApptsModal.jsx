@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import DropdownButton from "./DropdownButton";
 import auth from "../utils/auth";
 
-const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear, setLoading, setError }) => {
+const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, currentYear, setLoading, setError }) => {
 
     const token = auth.getToken();
+    const publicServices = services.filter(service => service.Private === false);
 
     const days = ['M', 'T', 'W', 'Th', 'F', 'Sa', 'Su']
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -18,17 +18,18 @@ const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear
     }
     const years = getYears();
 
-
     const [dates, setDates] = useState([]);
     const [newHourDisplay, setnewHourDisplay] = useState('12');
     const [newMinute, setNewMinute] = useState('00');
     const [newMeridiem, setNewMeridiem] = useState('AM');
-    const [startDate, setstartDate] = useState(currentDate);
-    const [startMonth, setstartMonth] = useState(months[currentMonth - 1]);
-    const [startYear, setstartYear] = useState(currentYear);
-    const [endDate, setendDate] = useState(currentDate);
-    const [endMonth, setendMonth] = useState(months[currentMonth - 1]);
-    const [endYear, setendYear] = useState(currentYear);
+    const [startDate, setStartDate] = useState(currentDate);
+    const [startMonth, setStartMonth] = useState(months[currentMonth - 1]);
+    const [startYear, setStartYear] = useState(currentYear);
+    const [endDate, setEndDate] = useState(currentDate);
+    const [endMonth, setEndMonth] = useState(months[currentMonth - 1]);
+    const [endYear, setEndYear] = useState(currentYear);
+    const [newApptStatus, setNewApptStatus] = useState(4);
+    const [newApptTypeId, setNewApptTypeId] = useState(null);
 
     useEffect(() => {
         const daysInMonth = new Date(startYear, months.indexOf(startMonth) + 1, 0).getDate();
@@ -42,12 +43,14 @@ const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear
     const clearStates = () => {
         setnewHourDisplay('12');
         setNewMinute('00');
-        setstartDate(currentDate);
-        setstartMonth(months[currentMonth - 1]);
-        setstartYear(currentYear);
-        setendDate(currentDate);
-        setendMonth(months[currentMonth - 1]);
-        setendYear(currentYear);
+        setStartDate(currentDate);
+        setStartMonth(months[currentMonth - 1]);
+        setStartYear(currentYear);
+        setEndDate(currentDate);
+        setEndMonth(months[currentMonth - 1]);
+        setEndYear(currentYear);
+        setNewApptStatus(0);
+        setNewApptTypeId(0);
     };
 
     const createAppts = async () => {
@@ -55,21 +58,24 @@ const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear
         setError('');
         // "DateTime": "2024-04-28 14:00:00"
         const selectedDays = days.filter(day => document.getElementById(day).checked);
-        const hour = newMeridiem === 'PM' ? parseInt(newHourDisplay) + 12 : parseInt(newHourDisplay);
+        let hour = newMeridiem === 'PM' ? parseInt(newHourDisplay) + 12 : parseInt(newHourDisplay);
+        hour = hour === 24 ? '00' : hour;
         const minute = parseInt(newMinute);
         const startDateTime = new Date(startYear, months.indexOf(startMonth), startDate, hour, minute);
         const endDateTime = new Date(endYear, months.indexOf(endMonth), endDate, hour, minute);
-        console.log(startDateTime);
+
         const createApptArray = () => {
             const appts = [];
             selectedDays.forEach(day => {
                 let date = startDateTime;
                 while (date <= endDateTime) {
                     if (date.getDay() === days.indexOf(day) + 1) {
-                        const newDateTime = {
-                            DateTime: `${date.toISOString().slice(0, 10)}T${hour}:${newMinute}:00`
+                        const newAppt = {
+                            DateTime: `${date.toISOString().slice(0, 10)}T${hour}:${newMinute}:00`,
+                            ApptTypeId: newApptTypeId,
+                            Status: newApptStatus
                         }
-                        appts.push(newDateTime);
+                        appts.push(newAppt);
                     }
                     date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // increases date by 1 day
                 }
@@ -77,71 +83,101 @@ const NewApptsModal = ({ refetch, months, currentDate, currentMonth, currentYear
             return appts;
         }
         const apptsToAdd = createApptArray();
-        try {
-            const response = await fetch(`https://tbohn2-001-site1.ctempurl.com/api/newAppts/`, {
-                method: 'POST',
-                body: JSON.stringify(apptsToAdd),
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            });
-            if (response.ok) {
-                setLoading(false);
-                clearStates();
-                refetch();
-            }
-            if (!response.ok) {
-                setLoading(false);
-                const error = await response.json();
-                setError(error);
-            }
-        }
-        catch (error) {
-            console.error(error);
-            setLoading(false);
-            setError('An error occurred while making request. Please try again later.');
-        }
+        console.log(apptsToAdd);
+        console.log(services);
+        // try {
+        //     const response = await fetch(`http://localhost:5062/api/newAppts/`, {
+        //         method: 'POST',
+        //         body: JSON.stringify(apptsToAdd),
+        //         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        //     });
+        //     if (response.ok) {
+        //         setLoading(false);
+        //         clearStates();
+        //         refetch();
+        //     }
+        //     if (!response.ok) {
+        //         setLoading(false);
+        //         const error = await response.json();
+        //         setError(error);
+        //     }
+        // }
+        // catch (error) {
+        //     console.error(error);
+        //     setLoading(false);
+        //     setError('An error occurred while making request. Please try again later.');
+        // }
     };
 
     return (
         <div className="modal fade" id="newApptsModal" tabIndex="-1" aria-labelledby="newApptsModalLabel"
             aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content d-flex justify-content-between text-light">
-                    <div id="modal-header" className="d-flex justify-content-between m-2">
+                <div className="modal-content d-flex justify-content-between text-darkgray">
+                    <div id="modal-header" className="rounded-top p-1 text-center">
                         <h1 className="modal-title fs-3" id="newApptsModalLabel">Add Appointments</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={clearStates}></button>
                     </div>
-                    <div id="modal-body" className="col-12 d-flex flex-column align-items-center flex-grow-1">
+                    <div id="modal-body" className="col-12 fs-3 d-flex flex-column align-items-center flex-grow-1">
+                        <select name="Status" className="custom-btn mt-2" onChange={(e) => setNewApptStatus(parseInt(e.target.value))}>
+                            <option value='4'>Public</option>
+                            <option value='0'>Private</option>
+                        </select>
+                        {newApptStatus === 4 &&
+                            <select name="ApptTypeId" className="custom-btn mt-2" onChange={(e) => setNewApptTypeId(parseInt(e.target.value))}>
+                                {publicServices.map((service, index) => <option key={index} value={service.Id} selected={service.Id === newApptTypeId}>{service.Name}</option>)}
+                            </select>
+                        }
                         <h2 className="my-2">Every</h2>
                         <div className="d-flex justify-content-evenly col-12">
                             {days.map(day => {
                                 return (
                                     <div key={day}>
-                                        <input type="checkbox" id={day} />
+                                        <input type="checkbox" className="day-checkbox" id={day} />
                                         <label className="d-flex justify-content-center align-items-center" htmlFor={day}>{day}</label>
                                     </div>
                                 )
                             })}
                         </div>
                         <h2 className="my-2">At</h2>
-                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
-                            <DropdownButton options={hours} newValue={newHourDisplay} setNewValue={setnewHourDisplay} />
-                            <p>:</p>
-                            <DropdownButton options={minutes} newValue={newMinute} setNewValue={setNewMinute} />
-                            <DropdownButton options={["AM", "PM"]} newValue={newMeridiem} setNewValue={setNewMeridiem} />
+                        <div className="d-flex col-12 justify-content-center align-items-center">
+                            <select className='custom-btn mx-1' value={newHourDisplay} onChange={(e) => setnewHourDisplay(e.target.value)}>
+                                {hours.map((hour, index) => <option key={index} value={hour}>{hour}</option>)}
+                            </select>
+                            <p className="d-flex align-items-center my-0">:</p>
+                            <select className="custom-btn mx-1" value={newMinute} onChange={(e) => setNewMinute(e.target.value)}>
+                                {minutes.map((minute, index) => <option key={index} value={minute}>{minute}</option>)}
+                            </select>
+                            <select className="custom-btn" onChange={(e) => setNewMeridiem(e.target.value)}>
+                                <option value="AM" selected>AM</option>
+                                <option value="PM">PM</option>
+                            </select>
                         </div>
                         <h2 className="my-2">From</h2>
-                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
-                            <DropdownButton options={months} newValue={startMonth} setNewValue={setstartMonth} />
-                            <DropdownButton options={dates} newValue={startDate} setNewValue={setstartDate} />
+                        <div className="d-flex col-12 justify-content-center align-items-center">
+                            <select className="custom-btn mx-1" value={startMonth} onChange={(e) => setStartMonth(e.target.value)}>
+                                {months.map((month, index) => <option key={index} value={month} >{month}</option>)}
+                            </select>
+                            <select className="custom-btn mx-1" value={startDate} onChange={(e) => setStartDate(parseInt(e.target.value))}>
+                                {dates.map((date, index) => <option key={index} value={date}>{date}</option>)}
+                            </select>
                             <p>,</p>
-                            <DropdownButton options={years} newValue={startYear} setNewValue={setstartYear} />
+                            <select className="custom-btn mx-1" value={startYear} onChange={(e) => setStartYear(parseInt(e.target.value))}>
+                                {years.map((year, index) => <option key={index} value={year}>{year}</option>)}
+                            </select>
                         </div>
                         <h2 className="my-2">To</h2>
-                        <div className="d-flex fs-3 col-12 justify-content-center align-items-center">
-                            <DropdownButton options={months} newValue={endMonth} setNewValue={setendMonth} />
-                            <DropdownButton options={dates} newValue={endDate} setNewValue={setendDate} />
+                        <div className="d-flex col-12 justify-content-center align-items-center">
+                            <select className="custom-btn mx-1" value={endMonth} onChange={(e) => setEndMonth(e.target.value)}>
+                                {months.map((month, index) => <option key={index} value={month}>{month}</option>)}
+                            </select>
+                            <select className="custom-btn mx-1" value={endDate} onChange={(e) => setEndDate(parseInt(e.target.value))}>
+                                {dates.map((date, index) => <option key={index} value={date}>{date}</option>)}
+                            </select>
                             <p>,</p>
-                            <DropdownButton options={years} newValue={endYear} setNewValue={setendYear} />
+                            <select className="custom-btn mx-1" value={endYear} onChange={(e) => setEndYear(parseInt(e.target.value))}>
+                                {years.map((year, index) => <option key={index} value={year}>{year}</option>)}
+                            </select>
                         </div>
                     </div>
                     <div id="modal-footer" className="d-flex align-self-end justify-content-end mt-2">

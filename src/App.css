@@ -78,31 +78,6 @@ input[type="radio"]:checked+label {
     border-image-repeat: stretch;
 }
 
-input[type="checkbox"] {
-    display: none;
-}
-
-input[type="checkbox"]+label {
-    color: var(--white);
-    position: relative;
-    width: 50px;
-    height: 50px;
-    font-size: 25px;
-    font-weight: 300;
-    border-radius: 50%;
-    z-index: 0;
-    background-image: radial-gradient(transparent 55%, var(--white) 60%, var(--pink) 75%);
-    background-size: cover;
-    background-position: center;
-    cursor: pointer;
-}
-
-input[type="checkbox"]:checked+label {
-    color: var(--pink);
-    position: relative;
-    background-image: radial-gradient(var(--white) 55%, var(--white) 60%, var(--pink) 75%);
-}
-
 #modal-header {
     border-bottom: 1px solid var(--darkgray);
     color: var(--white);
@@ -129,6 +104,16 @@ textarea {
 input:focus {
     border: 1px solid var(--purple);
     outline: 1px solid var(--purple);
+}
+
+select::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+option {
+    color: var(--purple);
+    background-color: var(--white);
 }
 
 @keyframes fade-in {
@@ -167,12 +152,4 @@ input:focus {
         right: 0%;
         top: 0%;
     }
-
-    input[type="checkbox"]+label {
-        width: 45px;
-        height: 45px;
-        font-size: 25px;
-        font-weight: 300;
-    }
-
 }

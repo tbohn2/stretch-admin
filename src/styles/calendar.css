@@ -96,6 +96,32 @@
     cursor: pointer;
 }
 
+.day-checkbox {
+    display: none;
+}
+
+.day-checkbox+label {
+    color: var(--darkgray);
+    position: relative;
+    width: 50px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: 300;
+    border-radius: 50%;
+    z-index: 0;
+    background-image: radial-gradient(transparent 55%, var(--white) 60%, var(--purple) 75%);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+
+.day-checkbox:checked+label {
+    color: var(--white);
+    position: relative;
+    background-image: radial-gradient(var(--purple) 55%, var(--white) 60%, var(--purple) 75%);
+    transition: all 0.5s ease;
+}
+
 @media screen and (max-width: 768px) {
     .date {
         height: 70px;
@@ -108,5 +134,12 @@
     .date-display:hover {
         cursor: none;
         text-decoration: none;
+    }
+
+    input[type="checkbox"]+label {
+        width: 45px;
+        height: 45px;
+        font-size: 25px;
+        font-weight: 300;
     }
 }
