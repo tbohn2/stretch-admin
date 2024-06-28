@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ClientApptModal from "../Components/ClientApptModal";
 import CalendarModal from "../Components/CalendarModal";
 import auth from "../utils/auth";
 import '../styles/clients.css';
