@@ -5,6 +5,8 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
 
     const token = auth.getToken();
     const publicServices = services.filter(service => service.Private === false);
+    const initialService = publicServices.length > 0 ? publicServices[0] : null;
+    const initialServiceId = initialService ? initialService.Id : 0;
 
     const days = ['M', 'T', 'W', 'Th', 'F', 'Sa', 'Su']
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -28,8 +30,9 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
     const [endDate, setEndDate] = useState(currentDate);
     const [endMonth, setEndMonth] = useState(months[currentMonth - 1]);
     const [endYear, setEndYear] = useState(currentYear);
-    const [newApptStatus, setNewApptStatus] = useState(4);
-    const [newApptTypeId, setNewApptTypeId] = useState(null);
+    const [newApptStatus, setNewApptStatus] = useState(0);
+    const [newApptTypeId, setNewApptTypeId] = useState(0);
+    const [checkedDays, setCheckedDays] = useState([]);
 
     useEffect(() => {
         const daysInMonth = new Date(startYear, months.indexOf(startMonth) + 1, 0).getDate();
@@ -39,6 +42,12 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
         }
         setDates(dates);
     }, [startMonth, startYear]);
+
+    useEffect(() => {
+        if (newApptStatus === 4) {
+            setNewApptTypeId(initialServiceId);
+        }
+    }, [newApptStatus]);
 
     const clearStates = () => {
         setnewHourDisplay('12');
@@ -51,15 +60,27 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
         setEndYear(currentYear);
         setNewApptStatus(0);
         setNewApptTypeId(0);
+        setCheckedDays([]);
+    };
+
+    const handleCheckedDay = (e) => {
+        const day = e.target.id;
+        if (e.target.checked) {
+            setCheckedDays([...checkedDays, day]);
+        }
+        if (!e.target.checked) {
+            const newCheckedDays = checkedDays.filter(checkedDay => checkedDay !== day);
+            setCheckedDays(newCheckedDays);
+        }
     };
 
     const createAppts = async () => {
         setLoading(true);
         setError('');
         // "DateTime": "2024-04-28 14:00:00"
-        const selectedDays = days.filter(day => document.getElementById(day).checked);
-        let hour = newMeridiem === 'PM' ? parseInt(newHourDisplay) + 12 : parseInt(newHourDisplay);
-        hour = hour === 24 ? '00' : hour;
+        const selectedDays = checkedDays;
+        let hour = newMeridiem === 'PM' && newHourDisplay !== '12' ? parseInt(newHourDisplay) + 12 : parseInt(newHourDisplay);
+        hour = hour === 12 && newMeridiem === 'AM' ? '00' : hour;
         const minute = parseInt(newMinute);
         const startDateTime = new Date(startYear, months.indexOf(startMonth), startDate, hour, minute);
         const endDateTime = new Date(endYear, months.indexOf(endMonth), endDate, hour, minute);
@@ -72,7 +93,7 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
                     if (date.getDay() === days.indexOf(day) + 1) {
                         const newAppt = {
                             DateTime: `${date.toISOString().slice(0, 10)}T${hour}:${newMinute}:00`,
-                            ApptTypeId: newApptTypeId,
+                            ApptTypeId: newApptStatus === 0 ? null : newApptTypeId,
                             Status: newApptStatus
                         }
                         appts.push(newAppt);
@@ -83,30 +104,29 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
             return appts;
         }
         const apptsToAdd = createApptArray();
-        console.log(apptsToAdd);
-        console.log(services);
-        // try {
-        //     const response = await fetch(`http://localhost:5062/api/newAppts/`, {
-        //         method: 'POST',
-        //         body: JSON.stringify(apptsToAdd),
-        //         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        //     });
-        //     if (response.ok) {
-        //         setLoading(false);
-        //         clearStates();
-        //         refetch();
-        //     }
-        //     if (!response.ok) {
-        //         setLoading(false);
-        //         const error = await response.json();
-        //         setError(error);
-        //     }
-        // }
-        // catch (error) {
-        //     console.error(error);
-        //     setLoading(false);
-        //     setError('An error occurred while making request. Please try again later.');
-        // }
+
+        try {
+            const response = await fetch(`http://localhost:5062/api/newAppts/`, {
+                method: 'POST',
+                body: JSON.stringify(apptsToAdd),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                setLoading(false);
+                clearStates();
+                refetch();
+            }
+            if (!response.ok) {
+                setLoading(false);
+                const error = await response.json();
+                setError(error);
+            }
+        }
+        catch (error) {
+            console.error(error);
+            setLoading(false);
+            setError('An error occurred while making request. Please try again later.');
+        }
     };
 
     return (
@@ -120,8 +140,8 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
                     </div>
                     <div id="modal-body" className="col-12 fs-3 d-flex flex-column align-items-center flex-grow-1">
                         <select name="Status" className="custom-btn mt-2" onChange={(e) => setNewApptStatus(parseInt(e.target.value))}>
-                            <option value='4'>Public</option>
-                            <option value='0'>Private</option>
+                            <option value='0' selected={newApptStatus == 0}>Private</option>
+                            <option value='4' selected={newApptStatus == 4}>Public</option>
                         </select>
                         {newApptStatus === 4 &&
                             <select name="ApptTypeId" className="custom-btn mt-2" onChange={(e) => setNewApptTypeId(parseInt(e.target.value))}>
@@ -133,7 +153,7 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
                             {days.map(day => {
                                 return (
                                     <div key={day}>
-                                        <input type="checkbox" className="day-checkbox" id={day} />
+                                        <input type="checkbox" className="day-checkbox" id={day} checked={checkedDays.includes(day)} onChange={handleCheckedDay} />
                                         <label className="d-flex justify-content-center align-items-center" htmlFor={day}>{day}</label>
                                     </div>
                                 )
