@@ -41,8 +41,19 @@ const CalendarModal = ({ services, displayService, setDisplayService, appts, dat
     const handleInputChange = (e) => {
         let { name, value } = e.target;
         if (name === 'MeridiemAM') { value === 'AM' ? value = true : value = false }
-        else if (name === 'Private') { value === 'true' ? value = true : value = false }
-        else { value = parseInt(value) }
+        if (name !== "Minutes") {
+            if (name === 'Status') {
+                let apptTypeId = null;
+                if (value === '4') { apptTypeId = publicServices[0].Id }
+                setNewApptDetails({
+                    ...newApptDetails,
+                    [name]: parseInt(value),
+                    ApptTypeId: apptTypeId
+                })
+                return;
+            }
+            value = parseInt(value)
+        }
 
         setNewApptDetails({
             ...newApptDetails,
@@ -81,17 +92,16 @@ const CalendarModal = ({ services, displayService, setDisplayService, appts, dat
         setLoading(true);
         setError('');
         // "DateTime": "2024-04-28 14:00:00"
-        let newHour = parseInt(newApptDetails.Hour);
-        if (newApptDetails.MeridiemAM === false) {
-            newHour += 12;
-            newHour = newHour === 24 ? '00' : newHour;
-        }
+
+        let newHour = newApptDetails.MeridiemAM === false && newApptDetails.Hour !== 12 ? newApptDetails.Hour + 12 : newApptDetails.Hour;
+        newHour = newHour === 12 && newApptDetails.MeridiemAM === true ? '00' : newHour;
 
         const newAppt = {
             AdminId: adminId,
             DateTime: `${year}-${month}-${date} ${newHour}:${newApptDetails.Minutes}:00`,
             // Server uses ApptType to determine status Available or Public
-            ApptTypeId: newApptDetails.ApptTypeId
+            ApptTypeId: newApptDetails.ApptTypeId,
+            Status: newApptDetails.Status
         }
 
         try {
