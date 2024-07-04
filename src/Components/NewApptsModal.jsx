@@ -4,6 +4,7 @@ import auth from "../utils/auth";
 const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, currentYear, setLoading, setError }) => {
 
     const token = auth.getToken();
+    const adminId = localStorage.getItem('admin_id');
     const publicServices = services.filter(service => service.Private === false);
     const initialService = publicServices.length > 0 ? publicServices[0] : null;
     const initialServiceId = initialService ? initialService.Id : 0;
@@ -92,6 +93,7 @@ const NewApptsModal = ({ refetch, services, months, currentDate, currentMonth, c
                 while (date <= endDateTime) {
                     if (date.getDay() === days.indexOf(day) + 1) {
                         const newAppt = {
+                            AdminId: adminId,
                             DateTime: `${date.toISOString().slice(0, 10)}T${hour}:${newMinute}:00`,
                             ApptTypeId: newApptStatus === 0 ? null : newApptTypeId,
                             Status: newApptStatus
