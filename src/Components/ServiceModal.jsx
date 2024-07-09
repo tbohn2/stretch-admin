@@ -170,7 +170,12 @@ const ServicesModal = ({ services, getServices }) => {
                     <option value='./src/assets/services1.jpg'>Yoga</option>
                     <option value='./src/assets/services2.jpg'>Stretch 1</option>
                     <option value='./src/assets/services3.jpg'>Stretch 2</option>
+                    <option value='./src/assets/services7.jpg'>Stretch 3</option>
                     <option value='./src/assets/services4.jpg'>Balls</option>
+                    <option value='./src/assets/services5.jpg'>Group</option>
+                    <option value='./src/assets/services6.jpg'>Head Massage</option>
+                    <option value='./src/assets/services8.jpg'>Equipment</option>
+
                 </select>
                 <select name='Private' className='col-12 text-center custom-btn my-1' value={serviceDetails.Private} onChange={handleInputChange}>
                     <option value={false}>Public</option>
