@@ -3,8 +3,8 @@
     --white: #e7f3f7;
     --gray: #e6e6e6;
     --darkgray: #838383;
-    --lav: #D1C4E9;
-    --purple: #585C7E;
+    --lav: #ede9f3;
+    --purple: #5c4888;
     font-family: 'Roboto', sans-serif;
     min-height: 100vh;
 }
@@ -58,13 +58,13 @@ nav label {
     font-size: 32px;
     font-weight: 100;
     cursor: pointer;
-    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
 }
 
 .logout-btn {
     position: absolute;
-    right: 7%;
-    top: 6%;
+    right: 5%;
+    top: 2%;
 }
 
 input[type="radio"] {
@@ -72,8 +72,8 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked+label {
-    border-top: 7px solid;
-    border-image: linear-gradient(to left, var(--white), var(--pink));
+    border-bottom: 7px solid;
+    border-image: linear-gradient(to left, var(--white), var(--purple));
     border-image-slice: 1;
     border-image-repeat: stretch;
 }
@@ -147,9 +147,13 @@ option {
 }
 
 @media screen and (max-width: 768px) {
+    nav {
+        padding-top: 40px;
+    }
+
     .logout-btn {
         position: absolute;
-        right: 0%;
-        top: 0%;
+        right: 1%;
+        top: 1%;
     }
 }
