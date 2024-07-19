@@ -126,7 +126,7 @@ function Clients() {
     }
 
     return (
-        <div id='clients' className="pb-2 text-light d-flex flex-column align-items-center">
+        <div id='clients' className="py-2 text-light d-flex flex-column align-items-center">
             {loading && <div className="spinner-border fade-in" role="status"></div>}
             {error && <div className="alert alert-danger fade-in">{error}</div>}
             {successMessage && <div className="alert alert-success fade-in">{successMessage}</div>}
@@ -172,11 +172,10 @@ function Clients() {
                                         const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                                         const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                         return (
-                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-between align-items-center col-10 col-lg-8 px-1 m-2"
+                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-evenly align-items-center col-10 col-lg-8 my-2"
                                                 onClick={() => setModalStates(appt)} data-bs-toggle='modal' data-bs-target='#apptsModal'>
-                                                <p className="fs-5 my-1 text-center">{date}</p>
-                                                <p className="fs-5 my-1 text-center">{time}</p>
-                                                <p className="fs-5 my-1 text-center">${appt.Price}</p>
+                                                <p className="fs-5 m-0 text-center">{date}</p>
+                                                <p className="fs-5 m-0 text-center">{time}</p>
                                             </div>
                                         )
                                     })}
