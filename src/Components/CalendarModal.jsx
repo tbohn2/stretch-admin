@@ -397,10 +397,10 @@ const CalendarModal = ({ services, displayService, setDisplayService, appts, dat
                                                                 <button type="button" className="custom-btn fs-5 my-2" onClick={toggleEditing}>Cancel</button>
                                                             </div>
                                                         :
-                                                        <div className="d-flex justify-content-evenly col-12">
-                                                            <button type="button" className="custom-btn success-btn col-4 fs-5 mb-3" onClick={completeAppt}>Set Complete</button>
-                                                            <button type="button" className="custom-btn col-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
-                                                            <button type="button" className="custom-btn danger-btn col-4 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
+                                                        <div className="d-flex flex-wrap justify-content-evenly mt-3 col-12">
+                                                            <button type="button" className="custom-btn success-btn col-12 col-md-4 fs-5 mb-3" onClick={completeAppt}>Set Complete</button>
+                                                            <button type="button" className="custom-btn col-12 col-md-3 fs-5 mb-3" onClick={toggleEditing}>Edit</button>
+                                                            <button type="button" className="custom-btn danger-btn col-12 col-md-4 fs-5 mb-3" onClick={toggleDeleting}>Delete</button>
                                                         </div>
                                                     }
                                                 </div>
