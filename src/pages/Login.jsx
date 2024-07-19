@@ -40,7 +40,7 @@ const Login = ({ setLoggedIn }) => {
     }
 
     return (
-        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center col-10 col-md-6 text-darkgray p-3 fs-4 bg-white rounded">
+        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center col-10 col-xl-6 text-darkgray p-3 fs-4 bg-white rounded">
             <h1>Login</h1>
             {error && <div className="fs-4 alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit} className="col-12 d-flex flex-column align-items-center">
