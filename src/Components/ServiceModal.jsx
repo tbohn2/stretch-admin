@@ -11,6 +11,7 @@ const ServicesModal = ({ services, getServices }) => {
         Name: '',
         Price: 0,
         Duration: 0,
+        ShortDescription: '',
         Description: '',
         Private: false,
         LocationName: '',
@@ -199,6 +200,10 @@ const ServicesModal = ({ services, getServices }) => {
                     <input type='text' className="col-12" name='LocationAddress' value={serviceDetails.LocationAddress} onChange={handleInputChange}></input>
                 </div>
                 <div className="col-12 my-1">
+                    <label className="col-12">Brief Description:</label>
+                    <input type='text' className="col-12" name='ShortDescription' value={serviceDetails.ShortDescription} onChange={handleInputChange} required></input>
+                </div>
+                <div className="col-12 my-1">
                     <label className="col-12">Description:</label>
                     <textarea type='text' className="col-12" name='Description' value={serviceDetails.Description} onChange={handleInputChange} required></textarea>
                 </div>
@@ -238,6 +243,8 @@ const ServicesModal = ({ services, getServices }) => {
                                                 {service.LocationName && <div className="col-12">{service.LocationName}</div>}
                                                 {service.LocationAddress && <div className="col-12">Address:</div>}
                                                 {service.LocationAddress && <div className="col-12">{service.LocationAddress}</div>}
+                                                <div className="col-12">Brief Description:</div>
+                                                <div className="col-12">{service.ShortDescription}</div>
                                                 <div className="col-12">Description:</div>
                                                 <div className="col-12">{service.Description}</div>
                                                 {deletingService ? (
