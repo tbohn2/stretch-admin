@@ -95,8 +95,8 @@ function CalendarDisplay({ mobile }) {
 
     return (
         <div className='my-3 col-12 d-flex justify-content-center fade-in'>
-            <div id="calendar" className="bg-gray rounded col-11 d-flex flex-column align-items-center">
-                <div id="calendar-header" className={`col-12 bg-white d-flex align-items-center ${mobile && 'flex-column-reverse'}`}>
+            <div id="calendar" className="bg-white text-purple rounded col-11 d-flex flex-column align-items-center">
+                <div id="calendar-header" className={`col-12 d-flex align-items-center ${mobile && 'flex-column-reverse'}`}>
                     <div>
                         <button id="prev" className="monthNavBtn mx-1 py-0 custom-btn" onClick={handlePrevClick}>&#8592;</button>
                         <button id="next" className="monthNavBtn mx-1 py-0 custom-btn" onClick={handleNextClick}>&#8594;</button>
@@ -105,7 +105,7 @@ function CalendarDisplay({ mobile }) {
                     {loading && <div className="spinner-border" role="status"></div>}
                     {error && <div className="alert alert-danger mx-2 my-0 p-2">{error}</div>}
                 </div>
-                <div id="calendar-body" className='col-12 bg-white'>
+                <div id="calendar-body" className='col-12'>
                     <div id="calendar-weekdays" className="d-flex justify-content-between col-12 ">
                         <div>Sun</div>
                         <div>Mon</div>
@@ -179,8 +179,8 @@ function CalendarDisplay({ mobile }) {
                     </div>
                 </div>
                 <div className={`col-12 mt-3 d-flex align-items-center justify-content-evenly ${mobile && 'flex-column'}`}>
-                    <button id="newApptBtn" className={`custom-btn fs-4 my-2 ${mobile && 'col-12'}`} data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
-                    <button id="servicesBtn" className={`custom-btn fs-4 my-2 ${mobile && 'col-12'}`} data-bs-toggle="modal" data-bs-target="#servicesModal">Services</button>
+                    <button id="newApptBtn" className="custom-btn fs-4 my-2 col-md-4 col-xl-3 col-xxl-2 col-12" data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
+                    <button id="servicesBtn" className="custom-btn fs-4 my-2 col-md-4 col-xl-3 col-xxl-2 col-12" data-bs-toggle="modal" data-bs-target="#servicesModal">Services</button>
                 </div>
             </div>
             <CalendarModal services={services} displayService={displayService} setDisplayService={setDisplayService} appts={dayAppts} date={displayDate} month={calendarMonth} year={calendarYear} refetch={getAppointments} token={token} />
