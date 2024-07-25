@@ -46,13 +46,13 @@ function App() {
         {loggedIn ?
           <div className='col-12'>
             <nav className='d-flex justify-content-evenly align-items-center'>
-              <Link to='/calendar' className='text-light' onClick={handleCalendarClick}>
+              <Link to='/calendar' onClick={handleCalendarClick}>
                 <input type="radio" className="" name="navOptions" id="option1" checked={calendarChecked} />
-                <label className="text-purple" htmlFor="option1">CALENDAR</label>
+                <label htmlFor="option1">CALENDAR</label>
               </Link>
-              <Link to='/clients' className='text-light' onClick={handleClientsClick}>
+              <Link to='/clients' onClick={handleClientsClick}>
                 <input type="radio" className="" name="navOptions" id="option2" checked={clientsChecked} />
-                <label className="text-purple" htmlFor="option2">CLIENTS</label>
+                <label htmlFor="option2">CLIENTS</label>
               </Link>
               <button className='custom-btn logout-btn danger-btn fs-5' onClick={() => handleLogout()}>Logout</button>
             </nav>
