@@ -180,7 +180,7 @@ function CalendarDisplay({ mobile }) {
                 </div>
                 <div className={`col-12 mt-3 d-flex align-items-center justify-content-evenly ${mobile && 'flex-column'}`}>
                     <button id="newApptBtn" className={`custom-btn fs-4 my-2 ${mobile && 'col-12'}`} data-bs-toggle="modal" data-bs-target="#newApptsModal">Add to Schedule</button>
-                    <button id="servicesBtn" className={`custom-btn fs-4 my-2 ${mobile && 'col-12'}`} data-bs-toggle="modal" data-bs-target="#servicesModal">Edit Services</button>
+                    <button id="servicesBtn" className={`custom-btn fs-4 my-2 ${mobile && 'col-12'}`} data-bs-toggle="modal" data-bs-target="#servicesModal">Services</button>
                 </div>
             </div>
             <CalendarModal services={services} displayService={displayService} setDisplayService={setDisplayService} appts={dayAppts} date={displayDate} month={calendarMonth} year={calendarYear} refetch={getAppointments} token={token} />

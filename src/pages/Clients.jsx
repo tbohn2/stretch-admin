@@ -151,7 +151,7 @@ function Clients() {
                                     const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                                     const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                     return (
-                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-evenly align-items-center col-10 col-lg-8 my-2"
+                                        <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-between align-items-center col-10 col-lg-8 px-3 my-2"
                                             onClick={() => { setModalStates(appt) }} data-bs-toggle="modal" data-bs-target="#apptsModal">
                                             <p className="fs-5 m-0 text-center">{date}</p>
                                             <p className="fs-5 m-0 text-center">{time}</p>
@@ -172,7 +172,7 @@ function Clients() {
                                         const time = new Date(appt.DateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                                         const date = new Date(appt.DateTime).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                                         return (
-                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-evenly align-items-center col-10 col-lg-8 my-2"
+                                            <div key={appt.Id} className="client-appt custom-btn pink-border d-flex justify-content-between align-items-center col-10 col-lg-8 px-3 my-2"
                                                 onClick={() => setModalStates(appt)} data-bs-toggle='modal' data-bs-target='#apptsModal'>
                                                 <p className="fs-5 m-0 text-center">{date}</p>
                                                 <p className="fs-5 m-0 text-center">{time}</p>

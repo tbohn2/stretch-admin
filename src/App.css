@@ -29,6 +29,10 @@
     color: var(--darkgray);
 }
 
+.text-purple {
+    color: var(--purple);
+}
+
 .border-darkgray {
     border: 1px solid var(--darkgray);
 }

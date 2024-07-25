@@ -237,16 +237,16 @@ const ServicesModal = ({ services, getServices }) => {
                                         {serviceDetails.Id === service.Id && !displayServiceForm &&
                                             <div className={`my-1 col-12 d-flex flex-wrap justify-content-center ${serviceDetails && 'fade-in'}`}>
                                                 <div className="col-12 text-center bg-purple text-white">{service.Private ? 'Private' : 'Public'}</div>
-                                                <div className="col-12">Price: ${service.Price}</div>
-                                                <div className="col-12">Duration: {service.Duration} min</div>
+                                                <div className="col-12">Price: <span className="text-purple">${service.Price}</span></div>
+                                                <div className="col-12">Duration: <span className="text-purple">{service.Duration} min</span></div>
                                                 {service.LocationName && <div className="col-12">Location:</div>}
-                                                {service.LocationName && <div className="col-12">{service.LocationName}</div>}
+                                                {service.LocationName && <div className="col-12 text-purple">{service.LocationName}</div>}
                                                 {service.LocationAddress && <div className="col-12">Address:</div>}
-                                                {service.LocationAddress && <div className="col-12">{service.LocationAddress}</div>}
+                                                {service.LocationAddress && <div className="col-12 text-purple">{service.LocationAddress}</div>}
                                                 <div className="col-12">Brief Description:</div>
-                                                <div className="col-12">{service.ShortDescription}</div>
+                                                <div className="col-12 text-purple">{service.ShortDescription}</div>
                                                 <div className="col-12">Description:</div>
-                                                <div className="col-12">{service.Description}</div>
+                                                <div className="col-12 text-purple">{service.Description}</div>
                                                 {deletingService ? (
                                                     <div className='col-12 fw-bold text-center'>
                                                         <p>Are you sure you want to delete this service?</p>

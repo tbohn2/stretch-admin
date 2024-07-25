@@ -347,18 +347,18 @@ const CalendarModal = ({ services, displayService, setDisplayService, appts, dat
                                 return (
                                     <div key={appt.Id} id={appt.Id} className="d-flex flex-column align-items-center col-11">
                                         <div className="appt-card col-12 px-1 mt-3 d-flex flex-wrap align-items-center">
-                                            <div className="appt-card-header col-12 d-flex px-1" onClick={() => toggleDetails(appt)}>
+                                            <div className="appt-card-header text-purple col-12 d-flex px-1" onClick={() => toggleDetails(appt)}>
                                                 <h2 className="fs-5 my-1 col-3">{time}</h2>
                                                 <h2 className="fs-5 my-1 col-6 text-center">{display}</h2>
                                                 <h2 className="my-1 col-3"></h2>
                                             </div>
                                             {apptDetails === appt &&
                                                 <div className={`appt-details pt-2 col-12 text-center ${apptDetails && 'fade-in'}`}>
-                                                    <h2 className="fs-5">Status: {statuses[appt.Status]}</h2>
+                                                    <h2 className="fs-5">Status: <span className="text-purple">{statuses[appt.Status]}</span></h2>
                                                     {displayService &&
                                                         <div>
-                                                            <h2 className="fs-5">{displayService.Name}</h2>
-                                                            <h2 className="fs-5">Price: ${displayService.Price}</h2>
+                                                            <h2 className="fs-5">Class Name: <span className="text-purple">{displayService.Name}</span></h2>
+                                                            <h2 className="fs-5">Price: <span className="text-purple">${displayService.Price}</span></h2>
                                                         </div>
                                                     }
                                                     {editingAppt ? (
@@ -366,14 +366,17 @@ const CalendarModal = ({ services, displayService, setDisplayService, appts, dat
                                                             {timeSelector()}
                                                         </div>
                                                     ) : (
-                                                        <h2 className="fs-5">Time: {time}</h2>
+                                                        <h2 className="fs-5">Time: <span className="text-purple">{time}</span></h2>
                                                     )}
+                                                    {displayService &&
+                                                        <h2 className="fs-5">Duration: <span className="text-purple">{displayService.Duration} min</span></h2>
+                                                    }
                                                     {client &&
                                                         <div className="my-2">
                                                             <h2 className="text-decoration-underline">Client Information</h2>
-                                                            <p className="fs-5 m-0">{client.Name}</p>
-                                                            <p className="fs-5 m-0">{client.Phone.includes('-') ? client.Phone : `${client.Phone.slice(0, 3)}-${client.Phone.slice(3, 6)}-${client.Phone.slice(6)}`}</p>
-                                                            <p className="fs-5 m-0">{client.Email}</p>
+                                                            <p className="fs-5 m-0 text-purple fw-bold">{client.Name}</p>
+                                                            <p className="fs-5 m-0 text-purple fw-bold">{client.Phone.includes('-') ? client.Phone : `${client.Phone.slice(0, 3)}-${client.Phone.slice(3, 6)}-${client.Phone.slice(6)}`}</p>
+                                                            <p className="fs-5 m-0 text-purple fw-bold">{client.Email}</p>
                                                         </div>
                                                     }
                                                     {appt.Status === 1 &&
