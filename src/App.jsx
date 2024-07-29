@@ -45,17 +45,19 @@ function App() {
       <div className='BG col-12 min-vh-100'>
         {loggedIn ?
           <div className='col-12'>
-            <nav className='d-flex justify-content-evenly align-items-center'>
-              <Link to='/calendar' onClick={handleCalendarClick}>
-                <input type="radio" className="" name="navOptions" id="option1" checked={calendarChecked} />
-                <label htmlFor="option1">CALENDAR</label>
-              </Link>
-              <Link to='/clients' onClick={handleClientsClick}>
-                <input type="radio" className="" name="navOptions" id="option2" checked={clientsChecked} />
-                <label htmlFor="option2">CLIENTS</label>
-              </Link>
-              <button className='custom-btn logout-btn danger-btn fs-5' onClick={() => handleLogout()}>Logout</button>
-            </nav>
+            <header className='mb-5 d-flex justify-content-end'>
+              <nav className='col-4 d-flex justify-content-evenly align-items-center'>
+                <Link to='/calendar' onClick={handleCalendarClick}>
+                  <input type="radio" className="" name="navOptions" id="option1" checked={calendarChecked} />
+                  <label htmlFor="option1">calendar</label>
+                </Link>
+                <Link to='/clients' onClick={handleClientsClick}>
+                  <input type="radio" className="" name="navOptions" id="option2" checked={clientsChecked} />
+                  <label htmlFor="option2">clients</label>
+                </Link>
+                <button className='logout-btn' onClick={() => handleLogout()}>logout</button>
+              </nav>
+            </header>
             <Routes>
               <Route exact path='/' element={<CalendarDisplay mobile={mobile} />} />
               <Route exact path='/calendar' element={<CalendarDisplay mobile={mobile} />} />
